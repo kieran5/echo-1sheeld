@@ -7,12 +7,19 @@
 #define CUSTOM_SETTINGS
 #define INCLUDE_VOICE_RECOGNIZER_SHIELD
 #define INCLUDE_TERMINAL_SHIELD
+#define INCLUDE_TEXT_TO_SPEECH_SHIELD
 
 /* Include 1Sheeld library. */
 #include <OneSheeld.h>
 
 /* Voice commands initialisation */
-const char zumoTestCommand[] = "zumo";
+//const char testCommand[] = "robot";
+
+const char robotGoForwardCommand[] = "robot go forward";
+const char robotGoBackwardsCommand[] = "robot go backwards";
+const char robotGoLeftCommand[] = "robot go left";
+const char robotGoRightCommand[] = "robot go right";
+
 
 void setup()
 {
@@ -22,19 +29,41 @@ void setup()
   VoiceRecognition.setOnError(error);
   
   VoiceRecognition.start();
+
 }
 
 void loop () 
 {
   /* Check if new command received. */
   if(VoiceRecognition.isNewCommandReceived())
-  {
+  {    
     /* Compare the command. */
-    if(!strcmp(zumoTestCommand,VoiceRecognition.getLastCommand()))
+    if(!strcmp(robotGoForwardCommand,VoiceRecognition.getLastCommand()))
     {
       /* Play the track. */
-      Serial.println("Zumo command received.");
+      Serial.println("Robot go forward command received.");
+      TextToSpeech.say("Go Forward");
     }
+    else if(!strcmp(robotGoBackwardsCommand,VoiceRecognition.getLastCommand()))
+    {
+      Serial.println("Robot go backwards command received.");
+      TextToSpeech.say("Go Backwards");            
+    }
+    else if(!strcmp(robotGoLeftCommand,VoiceRecognition.getLastCommand()))
+    {
+      Serial.println("Robot go left command received.");
+      TextToSpeech.say("Go Left");
+
+    }
+    else if(!strcmp(robotGoRightCommand,VoiceRecognition.getLastCommand()))
+    {
+      Serial.println("Robot go right command received.");
+      TextToSpeech.say("Go Right");
+            
+    }
+
+
+    
   }
 }
 
