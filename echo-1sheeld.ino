@@ -19,6 +19,7 @@ const char robotGoForwardCommand[] = "robot go forward";
 const char robotGoBackwardsCommand[] = "robot go backwards";
 const char robotGoLeftCommand[] = "robot go left";
 const char robotGoRightCommand[] = "robot go right";
+char* s;
 
 
 void setup()
@@ -37,25 +38,27 @@ void loop ()
   /* Check if new command received. */
   if(VoiceRecognition.isNewCommandReceived())
   {    
-    /* Compare the command. */
-    if(!strcmp(robotGoForwardCommand,VoiceRecognition.getLastCommand()))
+    Serial.println(VoiceRecognition.getLastCommand());
+    Serial.println(robotGoForwardCommand);
+    
+    if(strstr(VoiceRecognition.getLastCommand(), robotGoForwardCommand))
     {
       /* Play the track. */
       Serial.println("Robot go forward command received.");
       TextToSpeech.say("Go Forward");
     }
-    else if(!strcmp(robotGoBackwardsCommand,VoiceRecognition.getLastCommand()))
+    else if(strstr(VoiceRecognition.getLastCommand(), robotGoBackwardsCommand))
     {
       Serial.println("Robot go backwards command received.");
       TextToSpeech.say("Go Backwards");            
     }
-    else if(!strcmp(robotGoLeftCommand,VoiceRecognition.getLastCommand()))
+    else if(strstr(VoiceRecognition.getLastCommand(), robotGoLeftCommand))
     {
       Serial.println("Robot go left command received.");
       TextToSpeech.say("Go Left");
 
     }
-    else if(!strcmp(robotGoRightCommand,VoiceRecognition.getLastCommand()))
+    else if(strstr(VoiceRecognition.getLastCommand(), robotGoRightCommand))
     {
       Serial.println("Robot go right command received.");
       TextToSpeech.say("Go Right");
