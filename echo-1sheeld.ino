@@ -1,6 +1,6 @@
 /*
 
-/
+  /
 
 */
 
@@ -19,54 +19,65 @@ const char robotGoForwardCommand[] = "robot go forward";
 const char robotGoBackwardsCommand[] = "robot go backwards";
 const char robotGoLeftCommand[] = "robot go left";
 const char robotGoRightCommand[] = "robot go right";
+const char robotStopCommand[] = "robot stop";
 char* s;
 
 
 void setup()
 {
   /* Start Communication. */
+  Serial.begin(9600);
   OneSheeld.begin();
   /* Error Commands handiling. */
   VoiceRecognition.setOnError(error);
-  
+
   VoiceRecognition.start();
 
 }
 
-void loop () 
+void loop ()
 {
   /* Check if new command received. */
-  if(VoiceRecognition.isNewCommandReceived())
-  {    
-    Serial.println(VoiceRecognition.getLastCommand());
-    Serial.println(robotGoForwardCommand);
-    
-    if(strstr(VoiceRecognition.getLastCommand(), robotGoForwardCommand))
+  if (VoiceRecognition.isNewCommandReceived())
+  {
+    //Terminal.println(VoiceRecognition.getLastCommand());
+    //Terminal.println(robotGoForwardCommand);
+
+    if (strstr(VoiceRecognition.getLastCommand(), robotGoForwardCommand))
     {
-      /* Play the track. */
-      Serial.println("Robot go forward command received.");
-      TextToSpeech.say("Go Forward");
+      Serial.println("w");
+      //Terminal.println("Robot go forward command received.");
+      //TextToSpeech.say("Go Forward");
+      
     }
-    else if(strstr(VoiceRecognition.getLastCommand(), robotGoBackwardsCommand))
+    else if (strstr(VoiceRecognition.getLastCommand(), robotGoBackwardsCommand))
     {
-      Serial.println("Robot go backwards command received.");
-      TextToSpeech.say("Go Backwards");            
-    }
-    else if(strstr(VoiceRecognition.getLastCommand(), robotGoLeftCommand))
-    {
-      Serial.println("Robot go left command received.");
-      TextToSpeech.say("Go Left");
+      Serial.println("s");
+      //Terminal.println("Robot go backwards command received.");
+      //TextToSpeech.say("Go Backwards");
 
     }
-    else if(strstr(VoiceRecognition.getLastCommand(), robotGoRightCommand))
+    else if (strstr(VoiceRecognition.getLastCommand(), robotGoLeftCommand))
     {
-      Serial.println("Robot go right command received.");
-      TextToSpeech.say("Go Right");
-            
+      Serial.println("a");
+      //Terminal.println("Robot go left command received.");
+      //TextToSpeech.say("Go Left");
+    }
+    else if (strstr(VoiceRecognition.getLastCommand(), robotGoRightCommand))
+    {
+      Serial.println("d");
+      //Terminal.println("Robot go right command received.");
+      //TextToSpeech.say("Go Right");
+    }
+    else if (strstr(VoiceRecognition.getLastCommand(), robotStopCommand))
+    {
+      Serial.println("q");
+      //Terminal.println("Robot stop command received.");
+      //TextToSpeech.say("Stop");
     }
 
 
-    
+
   }
 }
 
@@ -76,14 +87,15 @@ void loop ()
 void error(byte errorData)
 {
   /* Switch on error and print it on the terminal. */
-  switch(errorData)
+  switch (errorData)
   {
-    case NETWORK_TIMEOUT_ERROR: Terminal.println("Network timeout");break;
-    case NETWORK_ERROR: Terminal.println("Network Error");break;
-    case AUDIO_ERROR: Terminal.println("Audio error");break;
-    case SERVER_ERROR: Terminal.println("No Server");break;
-    case SPEECH_TIMEOUT_ERROR: Terminal.println("Speech timeout");break;
-    case NO_MATCH_ERROR: Terminal.println("No match");break;
-    case RECOGNIZER_BUSY_ERROR: Terminal.println("Busy");break;
+    case NETWORK_TIMEOUT_ERROR: Terminal.println("Network timeout"); break;
+    case NETWORK_ERROR: Terminal.println("Network Error"); break;
+    case AUDIO_ERROR: Terminal.println("Audio error"); break;
+    case SERVER_ERROR: Terminal.println("No Server"); break;
+    case SPEECH_TIMEOUT_ERROR: Terminal.println("Speech timeout"); break;
+    case NO_MATCH_ERROR: Terminal.println("No match"); break;
+    case RECOGNIZER_BUSY_ERROR: Terminal.println("Busy"); break;
   }
 }
+
