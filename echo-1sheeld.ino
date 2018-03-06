@@ -1,9 +1,3 @@
-/*
-
-  /
-
-*/
-
 #define CUSTOM_SETTINGS
 #define INCLUDE_VOICE_RECOGNIZER_SHIELD
 #define INCLUDE_TERMINAL_SHIELD
@@ -75,6 +69,7 @@ void newCommand(String command)
     Serial.println("Robot go forward command received.");
     TextToSpeech.say("Go Forward");
     isActivated = false;
+
   }
   else if (strstr(VoiceRecognition.getLastCommand(), robotGoBackwardsCommand) && isActivated)
   {
@@ -82,6 +77,7 @@ void newCommand(String command)
     TextToSpeech.say("Go Backwards");
     isActivated = false;
   }
+
   else if (strstr(VoiceRecognition.getLastCommand(), robotGoLeftCommand) && isActivated)
   {
     Serial.println("Robot go left command received.");
