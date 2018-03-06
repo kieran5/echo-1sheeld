@@ -13,6 +13,9 @@ namespace SerialComms
 {
     public partial class SerialComms : Form
     {
+
+        //make sure the COM ports are set correctly (COM number + Baud rates) on the serial port objects in the designer or none of this will work.
+
         public delegate void AddDataDelegate(String myString);
         public AddDataDelegate myDelegate;
 

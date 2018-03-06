@@ -25,3 +25,12 @@ C:\Users\CFRat\Desktop\Zumo Assignment\SerialComms\SerialComms\obj\Debug\SerialC
 C:\Users\CFRat\Desktop\Zumo Assignment\SerialComms\SerialComms\obj\Debug\SerialComms.SerialComms.resources
 C:\Users\CFRat\Desktop\Zumo Assignment\SerialComms\SerialComms\obj\Debug\SerialComms.Properties.Resources.resources
 C:\Users\CFRat\Desktop\Zumo Assignment\SerialComms\SerialComms\obj\Debug\SerialComms.csproj.GenerateResource.Cache
+C:\Users\CFRat\Documents\echo-1sheeld\SerialComms\SerialComms\bin\Debug\SerialComms.exe.config
+C:\Users\CFRat\Documents\echo-1sheeld\SerialComms\SerialComms\obj\Debug\SerialComms.exe
+C:\Users\CFRat\Documents\echo-1sheeld\SerialComms\SerialComms\obj\Debug\SerialComms.pdb
+C:\Users\CFRat\Documents\echo-1sheeld\SerialComms\SerialComms\bin\Debug\SerialComms.exe
+C:\Users\CFRat\Documents\echo-1sheeld\SerialComms\SerialComms\bin\Debug\SerialComms.pdb
+C:\Users\CFRat\Documents\echo-1sheeld\SerialComms\SerialComms\obj\Debug\SerialComms.csprojResolveAssemblyReference.cache
+C:\Users\CFRat\Documents\echo-1sheeld\SerialComms\SerialComms\obj\Debug\SerialComms.SerialComms.resources
+C:\Users\CFRat\Documents\echo-1sheeld\SerialComms\SerialComms\obj\Debug\SerialComms.Properties.Resources.resources
+C:\Users\CFRat\Documents\echo-1sheeld\SerialComms\SerialComms\obj\Debug\SerialComms.csproj.GenerateResource.Cache

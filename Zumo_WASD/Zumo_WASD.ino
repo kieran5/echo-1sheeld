@@ -4,48 +4,44 @@
 
 //global variables
 //left and right motor speed, adjust here for known motor imbalance
-int baseLMS = 100; int baseRMS = 100; 
+int lms = 100; int rms = 100;
 ZumoMotors motors;
 
 void setup()
 {
   Serial.begin(9600);
-  
+
 }
 
 void loop()
 {
-  motors.setLeftSpeed(0);
-  motors.setRightSpeed(0);
-
 
   char motor = (char) Serial.read();
   switch (motor)
   {
     case 'w':
-      advance(baseLMS, baseRMS); break;
-    case 'a':
-      advance((-baseLMS), (baseRMS));
-      break;
-    case 's':
-      advance(-baseLMS, -baseRMS); break;
-    case 'd':
-      advance((baseLMS), (-baseRMS));
-      break;
-
-  }
-}
-
-void advance(int lms, int rms)
-{
-  while (!(Serial.read() == 'q'))
-  {
-
-    {
       motors.setLeftSpeed(lms);
       motors.setRightSpeed(rms);
-    }
+      break;
+    case 'a':
+      motors.setLeftSpeed(-lms);
+      motors.setRightSpeed(rms);
+      break;
+    case 's':
+      motors.setLeftSpeed(-lms);
+      motors.setRightSpeed(-rms);
+      break;
+    case 'd':
+      motors.setLeftSpeed(lms);
+      motors.setRightSpeed(-rms);
+      break;
+    case 'q':
+      motors.setLeftSpeed(0);
+      motors.setRightSpeed(0);
+      break;
   }
 }
+
+
 
 

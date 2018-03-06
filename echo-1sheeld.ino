@@ -1,7 +1,5 @@
 /*
-
   /
-
 */
 
 #define CUSTOM_SETTINGS
@@ -12,73 +10,91 @@
 /* Include 1Sheeld library. */
 #include <OneSheeld.h>
 
+// Initialise previous milliseconds for timer used in loop function
+unsigned long prevMs = 0;
+
+// Flag to check if user has said the initial command to activate the shield
+bool isActivated = false;
+
 /* Voice commands initialisation */
-//const char testCommand[] = "robot";
+const char initialCommand[] = "john";
 
 const char robotGoForwardCommand[] = "robot go forward";
 const char robotGoBackwardsCommand[] = "robot go backwards";
 const char robotGoLeftCommand[] = "robot go left";
 const char robotGoRightCommand[] = "robot go right";
-const char robotStopCommand[] = "robot stop";
 char* s;
 
 
 void setup()
 {
   /* Start Communication. */
-  Serial.begin(9600);
   OneSheeld.begin();
   /* Error Commands handiling. */
   VoiceRecognition.setOnError(error);
 
-  VoiceRecognition.start();
+  // This will trigger the new command function each time a new voice command is recognised
+  VoiceRecognition.setOnNewCommand(newCommand);
 
 }
 
 void loop ()
 {
-  /* Check if new command received. */
-  if (VoiceRecognition.isNewCommandReceived())
+
+  // Get current milliseconds for creating the timer
+  unsigned long currentMs = millis();
+
+  // Voice recognition listens out every 3 seconds for a new command
+  // This setup allows the voice recognition to be constantly active and listening out
+  // Won't have to interact with the smartphone at all
+  if (currentMs - prevMs >= 2500)
   {
-    //Terminal.println(VoiceRecognition.getLastCommand());
-    //Terminal.println(robotGoForwardCommand);
+    prevMs = currentMs;
 
-    if (strstr(VoiceRecognition.getLastCommand(), robotGoForwardCommand))
-    {
-      Serial.println("w");
-      //Terminal.println("Robot go forward command received.");
-      //TextToSpeech.say("Go Forward");
-      
-    }
-    else if (strstr(VoiceRecognition.getLastCommand(), robotGoBackwardsCommand))
-    {
-      Serial.println("s");
-      //Terminal.println("Robot go backwards command received.");
-      //TextToSpeech.say("Go Backwards");
-
-    }
-    else if (strstr(VoiceRecognition.getLastCommand(), robotGoLeftCommand))
-    {
-      Serial.println("a");
-      //Terminal.println("Robot go left command received.");
-      //TextToSpeech.say("Go Left");
-    }
-    else if (strstr(VoiceRecognition.getLastCommand(), robotGoRightCommand))
-    {
-      Serial.println("d");
-      //Terminal.println("Robot go right command received.");
-      //TextToSpeech.say("Go Right");
-    }
-    else if (strstr(VoiceRecognition.getLastCommand(), robotStopCommand))
-    {
-      Serial.println("q");
-      //Terminal.println("Robot stop command received.");
-      //TextToSpeech.say("Stop");
-    }
+    VoiceRecognition.start();
+  }
 
 
+}
+
+void newCommand(String command)
+{
+  // The initial command needs to be heard by the shield for it to be activated
+  // and other functions become available for use
+  if (!strcmp(initialCommand, VoiceRecognition.getLastCommand()))
+  {
+    Serial.println("John called, sheild activated.");
+    TextToSpeech.say("Yes darling?");
+    isActivated = true;
+  }
+
+  if (strstr(VoiceRecognition.getLastCommand(), robotGoForwardCommand) && isActivated)
+  {
+    Serial.println("Robot go forward command received.");
+    TextToSpeech.say("Go Forward");
+    isActivated = false;
+  }
+  else if (strstr(VoiceRecognition.getLastCommand(), robotGoBackwardsCommand) && isActivated)
+  {
+    Serial.println("Robot go backwards command received.");
+    TextToSpeech.say("Go Backwards");
+    isActivated = false;
+  }
+  else if (strstr(VoiceRecognition.getLastCommand(), robotGoLeftCommand) && isActivated)
+  {
+    Serial.println("Robot go left command received.");
+    TextToSpeech.say("Go Left");
+    isActivated = false;
 
   }
+  else if (strstr(VoiceRecognition.getLastCommand(), robotGoRightCommand) && isActivated)
+  {
+    Serial.println("Robot go right command received.");
+    TextToSpeech.say("Go Right");
+    isActivated = false;
+
+  }
+
 }
 
 
@@ -98,4 +114,3 @@ void error(byte errorData)
     case RECOGNIZER_BUSY_ERROR: Terminal.println("Busy"); break;
   }
 }
-
