@@ -29,7 +29,7 @@ namespace SerialComms
         {
             OneSheeld.Open();
             Zumo.Open();
-            this.myDelegate = new AddDataDelegate(AddDataMethod);
+            this.myDelegate = new AddDataDelegate(SendDataToZumo);
         }
 
         private void OneSheeld_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -39,12 +39,19 @@ namespace SerialComms
             lstSerial.Invoke(this.myDelegate, new Object[] { s });
         }
 
-        public void AddDataMethod(String s)
+        public void SendDataToZumo(String s)
         {
             lstSerial.Items.Add(s);
             lstSerial.SelectedIndex = lstSerial.Items.Count - 1;
             lstSerial.SelectedIndex = -1;
             Zumo.WriteLine(s);
+        }
+
+        private void Zumo_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            SerialPort sp = (SerialPort)sender;
+            string s = sp.ReadExisting();
+            lstSerial.Invoke(this.myDelegate, new Object[] { s });
         }
 
     }

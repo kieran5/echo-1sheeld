@@ -52,6 +52,7 @@
             // 
             this.Zumo.BaudRate = 57600;
             this.Zumo.PortName = "COM6";
+            this.Zumo.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.Zumo_DataReceived);
             // 
             // SerialComms
             // 
