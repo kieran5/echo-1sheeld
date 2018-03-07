@@ -11,7 +11,6 @@ HttpRequest scoreRequest("http://testwebsite.com");
 void setup()
 {
   OneSheeld.begin();
-  
   scoreRequest.addHeader("Content-Type", "application/x-www-form-urlencoded");
   scoreRequest.setOnSuccess(&onSuccess);
 }

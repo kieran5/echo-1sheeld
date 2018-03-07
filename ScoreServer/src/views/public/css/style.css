@@ -1,0 +1,55 @@
+
+.img-responsive {
+    margin:auto
+}
+
+.page-description {
+    width: 95%;
+    margin: auto;
+    text-align: center;
+    text-shadow: 1px 1px grey;
+}
+
+.navbar-brand {
+    text-shadow: 1px 1px grey;
+}
+
+
+
+.output {
+    text-shadow: 1px 1px grey;
+    background-color: gainsboro;
+    border-radius: 25px;
+    padding: 10px;
+    margin-top: 10px;
+    position: relative;
+    bottom: -60px;
+}
+
+img {
+    border-radius: 25px;
+    margin-bottom: 10px;
+    position: relative;
+    bottom: -60px;
+}
+
+
+
+.navbar-search-bar {
+    position: relative;
+    bottom: -12px;
+}
+
+.search-bar {
+    position: relative;
+    right: -10px;
+}
+
+table, th, td 
+        {
+            margin-left: auto;
+            margin-right: auto;
+            border:solid 1px #333;
+            padding:2px 4px;
+            font:15px Verdana;
+        }

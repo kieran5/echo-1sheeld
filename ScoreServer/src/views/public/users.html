@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <Title>MineTweeter</Title>
+
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="application/x-javascript"> 
+            addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
+            function hideURLbar(){ window.scrollTo(0,1); } 
+        </script>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="all" />
+
+
+
+
+
+</head>
+
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+
+        <div class="container">
+
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="projects.html">MineTweeter</a>
+            </div>
+
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="projects.html">Projects</a>
+                    </li>
+
+                    <nav class="navbar navbar-default navbar-fixed-top">
+                        <div class="container">
+                            <div class="navbar-header">
+                                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                                    aria-controls="navbar">
+                                    <span class="sr-only">Toggle navigation</span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </button>
+
+                                <a class="navbar-brand" href="projects.html">MineTweeter</a>
+                            </div>
+                            <div id="navbar" class="navbar-collapse collapse">
+                                <ul class="nav navbar-nav">
+                                    <li>
+                                        <a href="hiscores.html">Highscores</a>
+                                    </li>
+                                </ul>
+
+                                <ul class="nav navbar-nav navbar-right">
+                                    <!-- <li>
+                                        <a href="#" onclick="Delete();">Delete</a>
+                                        
+                                    </li> -->
+                                    <li>
+                                    <a href="#" onclick="Logout();">Log Out</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!--/.nav-collapse -->
+                        </div>
+                    </nav>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" onclick="Delete();">Delete</a>
+                    </li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </nav>
+
+    <div class="container">
+        <img src="http://s1.uploadpics.ru/images/Wyh1CUCDPG.png" class="img-responsive"
+            alt="Responsive image">
+    </div>
+
+    <div class="container">
+        <div class="output" id="output">
+            <p id="poutput">
+                <form action="../projects" method="post">
+                    Username:
+                    <br>
+                    <input id='Username' type="text" name="Username" value="">
+                    <br> Password:
+                    <br>
+                    <input type="text" name="Password" value="">
+                    <br>
+                    <br>
+                    <input type="submit" value="Register">
+                </form>
+                <br>
+                <button type="button" onclick="Login()">Log In</button>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            $('form').submit(function () {
+                var user = $(this).serialize();
+                $.ajax({
+                    type: "POST",
+                    url: "../users",
+                    data: user,
+                    success: function (data) {
+                        myXHR.onload = document.getElementById('poutput').innerHTML = "User registered";
+                    }
+                });
+                return false;
+            });
+        });
+
+        var myXHR = new XMLHttpRequest();
+
+        function Login() {
+            myXHR.onload = StoreDetails;
+            var user = $("form").serialize();
+            //navigates to /bob as a last minute fudge to stop blank usernames triggering a login
+            myXHR.open("POST", "../users/bob", true);
+            myXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            myXHR.send(user);
+
+        }
+
+        function Logout(){
+            sessionStorage.removeItem("userID");
+            document.getElementById('poutput').innerHTML = "Logged out succesfully";
+        }
+
+        function StoreDetails() {
+            console.log(myXHR.responseText);
+            if (myXHR.responseText != "null") {
+                var myJSON = JSON.parse(myXHR.responseText);
+                document.getElementById('poutput').innerHTML = "Logged in succesfully";
+                //hideous corner cut below. Not backwards compatible.
+                sessionStorage.setItem("userID", myJSON._id);
+            }
+            else {
+                document.getElementById('poutput').innerHTML = "Couldn't log in";
+            }
+        }
+
+        function Delete() {
+            var path = "../users/" + sessionStorage.getItem("userID");
+            console.log(path);
+            myXHR.onload = document.getElementById('poutput').innerHTML = "User deleted succesfully";
+            myXHR.open("DELETE", path, true);
+            myXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            myXHR.send();
+            sessionStorage.removeItem("userID");
+            
+        }
+    </script>
+
+
+
+
+</body>
+
+</html>
