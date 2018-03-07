@@ -18,18 +18,31 @@ HttpRequest scoreRequest("http://kwillis.eu/hiscores/");
 void setup()
 {
   OneSheeld.begin();
-  scoreRequest.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  
   scoreRequest.setOnSuccess(&onSuccess);
+  scoreRequest.setOnFailure(&onFailure);
+  scoreRequest.addHeader("Content-Type", "application/x-www-form-urlencoded");
 }
 
-void loop ()
-{  
-  Terminal.println(&(jsonString1+nickname+jsonString2+scoreString+jsonString3)[0]);
-  scoreRequest.addRawData(&(jsonString1+nickname+jsonString2+scoreString+jsonString3)[0]);
+void loop()
+{
+  Terminal.println(&(jsonString1 + nickname + jsonString2 + scoreString + jsonString3)[0]);
+  scoreRequest.addRawData(&(jsonString1 + nickname + jsonString2 + scoreString + jsonString3)[0]);
+  
   Internet.performPost(scoreRequest);
 }
 
-void onSuccess (HttpResponse &response)
+void onSuccess (HttpResponse &res)
 {
- Terminal.println("Request succeeded"); 
+  Terminal.println("Request succeeded");
+  Terminal.println(res.getStatusCode());
+  Terminal.println(res.getTotalBytesCount());
 }
+
+void onFailure (HttpResponse &res)
+{
+  Terminal.println("Request succeeded");
+  Terminal.println(res.getStatusCode());
+  Terminal.println(res.getTotalBytesCount());
+}
+
