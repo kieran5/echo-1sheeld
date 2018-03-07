@@ -41,7 +41,7 @@ void onSuccess (HttpResponse &res)
 
 void onFailure (HttpResponse &res)
 {
-  Terminal.println("Request succeeded");
+  Terminal.println("Request failed");
   Terminal.println(res.getStatusCode());
   Terminal.println(res.getTotalBytesCount());
 }
