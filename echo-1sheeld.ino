@@ -6,7 +6,7 @@
 
 #include <OneSheeld.h>
 
-HttpRequest scoreRequest("http://testwebsite.com");
+HttpRequest scoreRequest("http://kwillis.eu/hiscores/");
 
 void setup()
 {
