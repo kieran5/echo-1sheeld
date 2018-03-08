@@ -1,6 +1,12 @@
 
 .img-responsive {
-    margin:auto
+    margin:auto;
+}
+
+iframe {
+    width: 560px;
+    display: block;
+    margin: 0 auto;
 }
 
 .page-description {
