@@ -1,5 +1,14 @@
 //includes
 #include <ZumoMotors.h>
+#include <ZumoBuzzer.h>
+#include <ZumoMotors.h>
+#include <Pushbutton.h> 
+
+#define LED 13 //for the Zumo LED
+
+ZumoBuzzer buzzer;
+ZumoMotors motors;
+Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 
 
 //global variables
@@ -8,11 +17,17 @@
 int lms = 100; int rms = 100;
 
 int c = -1;
-char motor = "";
-ZumoMotors motors;
+char motor;
 
 void setup()
 {
+  //turn LED on and wait for button push before playing tune and handshake with processing
+  digitalWrite(LED, HIGH);
+  button.waitForButton();
+  digitalWrite(LED, LOW);
+  buzzer.play(">g32>>c32");
+  delay(1000);
+  
   Serial.begin(9600);
 
   Serial.println("I");
