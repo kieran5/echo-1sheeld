@@ -44,17 +44,18 @@ void setup()
 
   while (zumos.size() < 2)
   {
-    if (Serial.available() > 0) {
-      c = (char)Serial.read();
-      Serial.println(c);
+    if (xBee.available() > 0) {
+      c = (char) xBee.read();
+      xBee.println(c);
       if (c == 'I')
       {
-        Serial.println(zumos.size() + 1);
+        xBee.println(zumos.size() + 1);
         zumos.push_back(zumos.size() + 1);
       }
     }
     
   }
+  xBee.println("1w");
 
 }
 
