@@ -104,14 +104,14 @@
     </nav>
 
     <div class="container">
-        <img src="http://s1.uploadpics.ru/images/Wyh1CUCDPG.png" class="img-responsive"
-            alt="Responsive image">
+        <img src="http://s1.uploadpics.ru/images/Wyh1CUCDPG.png" class="img-responsive" alt="Responsive image">
     </div>
 
 
     <div class="container">
         <div class="output" id="yt">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/live_stream?channel=CHANNEL_ID&autoplay=1" class="video" frameborder="0" allowfullscreen></iframe>
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/live_stream?channel=CHANNEL_ID&autoplay=1" class="video"
+                frameborder="0" allowfullscreen></iframe>
         </div>
     </div>
 
@@ -163,13 +163,13 @@
     <script>
         $(document).ready(function () {
             $('form').submit(function () {
-                    var project = $(this).serialize();
-                    myXHR.open("POST", "../hiscores/", true);
-                    myXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                    myXHR.send(project);
-                    makeDataRequest();
-                    makeDataRequest();
-                    return false;
+                var project = $(this).serialize();
+                myXHR.open("POST", "../hiscores/", true);
+                myXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                myXHR.send(project);
+                makeDataRequest();
+                makeDataRequest();
+                return false;
             });
         });
 
@@ -179,6 +179,12 @@
             var myJson = JSON.parse(myXHR.responseText);
             var noRecords = myJson.length;
             var table = document.createElement("table");
+
+            myJson.sort(function (a, b) {
+                return a.score < b.score;
+            });
+
+            myJson.sort();
 
             for (var i = 0; i < noRecords; i++) {
                 tr = table.insertRow(-1);
@@ -198,11 +204,11 @@
         }
 
         function UpdateProject() {
-                var project = $("form").serialize();
-                myXHR.open("PUT", "../hiscores/" + _id.value, true);
-                myXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                myXHR.send(project);
-                makeDataRequest();
+            var project = $("form").serialize();
+            myXHR.open("PUT", "../hiscores/" + _id.value, true);
+            myXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            myXHR.send(project);
+            makeDataRequest();
         }
 
         function makeDataRequest() {
@@ -235,8 +241,8 @@
                 myXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                 myXHR.send();
                 makeDataRequest();
-            }        
-    }
+            }
+        }
     </script>
 
 
