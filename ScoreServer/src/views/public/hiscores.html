@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <Title>MineTweeter</Title>
+
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="application/x-javascript"> 
+            addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
+            function hideURLbar(){ window.scrollTo(0,1); } 
+        </script>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="all" />
+
+
+
+
+
+</head>
+
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+
+        <div class="container">
+
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="hiscores.html">MineTweeter</a>
+            </div>
+
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="users.html">Account</a>
+                    </li>
+
+                    <nav class="navbar navbar-default navbar-fixed-top">
+                        <div class="container">
+                            <div class="navbar-header">
+                                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                                    aria-controls="navbar">
+                                    <span class="sr-only">Toggle navigation</span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </button>
+
+                                <a class="navbar-brand" href="hiscores.html">MineTweeter</a>
+                            </div>
+                            <div id="navbar" class="navbar-collapse collapse">
+                                <ul class="nav navbar-nav">
+                                    <li>
+                                        <a href="users.html">Account</a>
+                                    </li>
+                                </ul>
+
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li>
+                                        <form>
+                                            <input class="navbar-search-bar" id="navbarSearchbar" value=""></input>
+                                        </form>
+                                    </li>
+                                    <!-- I'm cutting corners here. Don't do this in a real website -->
+                                    <li>
+                                        <a href="#" onclick="Search();">Search</a>
+                                    </li>
+                                    <!-- <li>
+                                        <a href="#" onclick="Delete();">Delete</a>
+                                    </li> -->
+                                </ul>
+                            </div>
+                            <!--/.nav-collapse -->
+                        </div>
+                    </nav>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <form>
+                            <input class="search-bar" id="searchbar" value=""></input>
+                        </form>
+                    </li>
+                    <li>
+                        <a href="#" onclick="Search();">Search</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="Delete();">Delete</a>
+                    </li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </nav>
+
+    <div class="container">
+        <img src="http://s1.uploadpics.ru/images/Wyh1CUCDPG.png" class="img-responsive" alt="Responsive image">
+    </div>
+
+
+    <div class="container">
+        <div class="output" id="yt">
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/live_stream?channel=CHANNEL_ID&autoplay=1" class="video"
+                frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    
+
+
+
+
+    <!-- <div class="container">
+        <div class="output" id="output2">
+            <p id="poutput2">
+                <form action="../projects" method="post">
+                    Person:
+                    <br>
+                    <input type="text" name="Person" value="">
+                    <br> Resource:
+                    <br>
+                    <input type="text" name="Resource" value="">
+                    <br> Location:
+                    <br>
+                    <input type="text" name="Location" value="">
+                    <br> Timing:
+                    <br>
+                    <input type="text" name="Timing" value="">
+                    <br>
+                    <br>
+                    <input type="submit" value="Add Project">
+                </form>
+                <br> ID:
+                <br>
+                <input id='_id' type="text" name="_id" value=""></input>
+                <br>
+                <br>
+                <button type="button" onclick="UpdateProject()">Update Project</button>
+            </p>
+        </div>
+    </div> -->
+
+    <div class="table-container">
+        <div id="output">
+            <p id="poutput">
+                <table class="table" id="table">
+                    <thead>
+                        <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">First</th>
+                        <th scope="col">Score</th>
+                        <th scope="col">Handle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+                
+            </p>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('form').submit(function () {
+                var project = $(this).serialize();
+                myXHR.open("POST", "../hiscores/", true);
+                myXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                myXHR.send(project);
+                makeDataRequest();
+                makeDataRequest();
+                return false;
+            });
+        });
+
+        var myXHR = new XMLHttpRequest();
+
+        function showData() {
+            var myJson = JSON.parse(myXHR.responseText);
+            var noRecords = myJson.length;
+            var table = document.getElementById("table");
+
+            myJson.sort(function (a, b) {
+                return a.score < b.score;
+            });
+
+            myJson.sort();
+
+            for (var i = 0; i < noRecords; i++) {
+                tr = table.getElementsByTagName('tbody')[0].insertRow(-1);
+
+                var headerCell = document.createElement('th');
+                headerCell.innerHTML = i + 1;
+                tr.appendChild(headerCell);
+
+                var tabCell = tr.insertCell(-1);
+                tabCell.innerHTML = myJson[i].nickname;
+                var tabCell = tr.insertCell(-1);
+                tabCell.innerHTML = myJson[i].score;
+            }
+            document.getElementById('poutput').innerHTML = "";
+            document.getElementById('poutput').appendChild(table);
+
+        }
+
+        window.onload = function () {
+            makeDataRequest();
+        }
+
+        function UpdateProject() {
+            var project = $("form").serialize();
+            myXHR.open("PUT", "../hiscores/" + _id.value, true);
+            myXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            myXHR.send(project);
+            makeDataRequest();
+        }
+
+        function makeDataRequest() {
+            myXHR.onload = showData;
+            myXHR.open("GET", "../hiscores/", true);
+            myXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            myXHR.send();
+        }
+
+        function getValue() {
+
+            var val1 = document.getElementById('searchbar').value;
+            var val2 = document.getElementById('navbarSearchbar').value;
+            if (val1 == "") { return val2; }
+            else { return val1; }
+        }
+        function Search() {
+            var path = "../hiscores/" + getValue();
+            myXHR.onload = showData;
+            myXHR.open("GET", path, true);
+            myXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            myXHR.send();
+        }
+
+        function Delete() {
+            if (sessionStorage.getItem("userID") != null) {
+                var path = "../hiscores/" + getValue();
+                myXHR.onload = document.getElementById('poutput').innerHTML = "Record Deleted";
+                myXHR.open("DELETE", path, true);
+                myXHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                myXHR.send();
+                makeDataRequest();
+            }
+        }
+    </script>
+
+
+
+
+</body>
+
+</html>
