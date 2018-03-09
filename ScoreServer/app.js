@@ -5,7 +5,7 @@ import hiscoresRouter from './src/routes/hiscoreRoutes';
 import usersRouter from './src/routes/userRoutes';
 
 const app = express();
-const PORT = 3000;
+const PORT = 5000;
 const path = require('path');
 
 app.set("view engine", "pug");
