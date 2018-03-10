@@ -39,10 +39,10 @@ void setup()
   scoreRequest.setOnFailure(&onFailure);
   scoreRequest.addHeader("Content-Type", "application/json");
 
-  //Test UART and SoftwareSerial are working
-  delay(2000);
-  Serial.println("----- UART Serial -----");
-  xBee.println("----- Software Serial -----");
+//  //Test UART and SoftwareSerial are working
+//  delay(2000);
+//  Serial.println("----- UART Serial -----");
+//  xBee.println("----- Software Serial -----");
 }
 
 void loop()
@@ -58,8 +58,7 @@ void loop()
         delay(100);
         xBee.write(connectionCount / 256);
         xBee.write(connectionCount % 256);
-        
-        xBee.println(value);
+        xBee.write(0x0A);
         break;
     }
   }
