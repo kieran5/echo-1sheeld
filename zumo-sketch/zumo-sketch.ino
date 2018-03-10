@@ -33,23 +33,31 @@ void setup()
 
   Serial.begin(9600);
 
-  Serial.println("I");
-  
-  delay(100);
+  delay(200);
 
-  myId = (int) Serial.read();
+  Serial.println('I');
   
+  delay(200);
+
+  byte b1 = Serial.read();
+  byte b2 = Serial.read();
+
+  myId = b1 * 256 + b2;
+
+  delay(100);
+  
+  Serial.println(myId);
 }
 
 void loop()
 {
-  if (myId != -1) {
-      digitalWrite(LED, HIGH);
+  for (int i=0; i < myId; ++i) {
+    digitalWrite(LED, HIGH);
+    delay(800);
+    digitalWrite(LED, LOW);
+    delay(2000);
   }
-  else {
-      digitalWrite(LED, LOW);
-  }
-
+}
 
 
 
@@ -90,7 +98,7 @@ void loop()
 //
 //    delay(5000);
 //  }
-}
+//}
 
 
 

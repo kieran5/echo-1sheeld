@@ -55,7 +55,10 @@ void loop()
     {
       case 'I':
         ++connectionCount;
-        value = (char) connectionCount;
+        delay(100);
+        xBee.write(connectionCount / 256);
+        xBee.write(connectionCount % 256);
+        
         xBee.println(value);
         break;
     }
