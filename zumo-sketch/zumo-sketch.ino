@@ -17,8 +17,10 @@ Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 int lms = 100; int rms = 100;
 
 int myId = -1;
+int reqId = -2;
 String motor;
-char command;
+char value;
+
 
 String myAddress = "01";
 
@@ -51,11 +53,19 @@ void setup()
 
 void loop()
 {
-  for (int i=0; i < myId; ++i) {
-    digitalWrite(LED, HIGH);
-    delay(800);
-    digitalWrite(LED, LOW);
-    delay(2000);
+  if (Serial.available() > 0) {
+    value = (char) Serial.read();
+
+    switch (value)
+    {
+      case 'M':
+        reqId = Serial.readStringUntil('>').toInt();
+        String req = Serial.readString();
+    }
+
+    if (reqId == myId) {
+      //request was for us...
+    }
   }
 }
 
