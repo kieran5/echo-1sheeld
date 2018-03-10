@@ -16,9 +16,11 @@ Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 //left and right motor speed, adjust here for known motor imbalance
 int lms = 100; int rms = 100;
 
-int zumoId = -1;
+int myId = -1;
 String motor;
 char command;
+
+String myAddress = "01";
 
 void setup()
 {
@@ -31,56 +33,72 @@ void setup()
 
   Serial.begin(9600);
 
-  Serial.println("I");
+  delay(200);
 
-  while (zumoId == -1)
-  {
-    zumoId = Serial.read();
-  }
+  Serial.println('I');
+  
+  delay(200);
 
-  zumoId = zumoId - 48;
+  byte b1 = Serial.read();
+  byte b2 = Serial.read();
+
+  myId = b1 * 256 + b2;
+
+  delay(100);
+  
+  Serial.println(myId);
 }
 
 void loop()
 {
-  motor = Serial.readString();
-
-  //first element is the zumo identifier, second is WASD command
-  char myString[2];
-  motor.toCharArray(myString, 2);
-
-  char idSignal = myString[0];
-  char wasdSignal = myString[1];
-
-  Serial.println("First element: " + myString[0]);
-  Serial.println("Second element: " + myString[1]);
-
-  if (zumoId == idSignal) {
-    switch (wasdSignal)
-    {
-      case 'w':
-        motors.setLeftSpeed(lms);
-        motors.setRightSpeed(rms);
-        break;
-      case 'a':
-        motors.setLeftSpeed(-lms);
-        motors.setRightSpeed(rms);
-        break;
-      case 's':
-        motors.setLeftSpeed(-lms);
-        motors.setRightSpeed(-rms);
-        break;
-      case 'd':
-        motors.setLeftSpeed(lms);
-        motors.setRightSpeed(-rms);
-        break;
-      case 'q':
-        motors.setLeftSpeed(0);
-        motors.setRightSpeed(0);
-        break;
-    }
+  for (int i=0; i < myId; ++i) {
+    digitalWrite(LED, HIGH);
+    delay(800);
+    digitalWrite(LED, LOW);
+    delay(2000);
   }
 }
+
+
+
+//  //first element is the zumo identifier, second is WASD command
+//  char myString[2];
+//  motor.toCharArray(myString, 2);
+//
+//  char idSignal = myString[0];
+//  char wasdSignal = myString[1];
+//
+//  Serial.println("First element: " + myString[0]);
+//  Serial.println("Second element: " + myString[1]);
+//
+//  if (zumoId == idSignal) {
+//    switch (wasdSignal)
+//    {
+//      case 'w':
+//        motors.setLeftSpeed(lms);
+//        motors.setRightSpeed(rms);
+//        break;
+//      case 'a':
+//        motors.setLeftSpeed(-lms);
+//        motors.setRightSpeed(rms);
+//        break;
+//      case 's':
+//        motors.setLeftSpeed(-lms);
+//        motors.setRightSpeed(-rms);
+//        break;
+//      case 'd':
+//        motors.setLeftSpeed(lms);
+//        motors.setRightSpeed(-rms);
+//        break;
+//      case 'q':
+//        motors.setLeftSpeed(0);
+//        motors.setRightSpeed(0);
+//        break;
+//    }
+//
+//    delay(5000);
+//  }
+//}
 
 
 

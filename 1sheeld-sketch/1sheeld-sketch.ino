@@ -12,7 +12,9 @@ AltSoftSerial xBee;
 using std::vector;
 
 vector<int> zumos;
-char c;
+char value;
+
+int connectionCount = 0;
 
 //Our player's name and their score
 String nickname = "";
@@ -37,31 +39,29 @@ void setup()
   scoreRequest.setOnFailure(&onFailure);
   scoreRequest.addHeader("Content-Type", "application/json");
 
-  //Test UART and SoftwareSerial are working
-  delay(2000);
-  Serial.println("----- UART Serial -----");
-  xBee.println("----- Software Serial -----");
-
-  while (zumos.size() < 2)
-  {
-    if (xBee.available() > 0) {
-      c = (char) xBee.read();
-      xBee.println(c);
-      if (c == 'I')
-      {
-        xBee.println(zumos.size() + 1);
-        zumos.push_back(zumos.size() + 1);
-      }
-    }
-    
-  }
-  xBee.println("1w");
-
+//  //Test UART and SoftwareSerial are working
+//  delay(2000);
+//  Serial.println("----- UART Serial -----");
+//  xBee.println("----- Software Serial -----");
 }
 
 void loop()
 {
+  if (xBee.available() > 0) {
 
+    value = (char) xBee.read();
+
+    switch (value)
+    {
+      case 'I':
+        ++connectionCount;
+        delay(100);
+        xBee.write(connectionCount / 256);
+        xBee.write(connectionCount % 256);
+        xBee.write(0x0A);
+        break;
+    }
+  }
 }
 
 void submitScore() {
@@ -75,14 +75,16 @@ void submitScore() {
 }
 
 void onFailure (HttpResponse &res)
-{ //Do below on an unsuccessful HTTP request
+{ 
+  //Do below on an unsuccessful HTTP request
   Terminal.println("Request failed");
   Terminal.println(res.getStatusCode());
   Terminal.println(res.getTotalBytesCount());
 }
 
 void onSuccess (HttpResponse &res)
-{ //Do below on a successful HTTP request
+{ 
+  //Do below on a successful HTTP request
   Terminal.println("Request succeeded");
   Terminal.println(res.getStatusCode());
   Terminal.println(res.getTotalBytesCount());
