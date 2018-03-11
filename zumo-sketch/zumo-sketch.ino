@@ -18,9 +18,10 @@ int lms = 100; int rms = 100;
 
 int myId = -1;
 int reqId = -2;
+String req = "";
 String motor;
 char value;
-
+char reqChar;
 
 String myAddress = "01";
 
@@ -59,12 +60,28 @@ void loop()
     switch (value)
     {
       case 'M':
-        reqId = Serial.readStringUntil('>').toInt();
-        String req = Serial.readString();
+        String idString = Serial.readStringUntil(':');
+        reqId = idString.toInt();
+        req = Serial.readString();
+        reqChar = req.charAt(0);
+
+        Serial.println(reqChar);
+       
     }
 
     if (reqId == myId) {
+      Serial.println("hit");
       //request was for us...
+      if(reqChar == 'w') {
+        motors.setSpeeds(100, 100);
+        delay(2500);
+        motors.setSpeeds(0, 0); 
+
+        
+      }
+
+      req = "";
+      reqId = -2;
     }
   }
 }
