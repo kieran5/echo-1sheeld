@@ -1,17 +1,20 @@
 #define CUSTOM_SETTINGS
 #define INCLUDE_TERMINAL_SHIELD
 #define INCLUDE_INTERNET_SHIELD
+#define INCLUDE_PUSH_BUTTON_SHIELD
 
 #include <OneSheeld.h>
 #include <AltSoftSerial.h>
-#include <ArduinoSTL.h>
+//#include <ArduinoSTL.h>
 
 //Set up SoftwareSerial for our xBee comms (AltSoftSerial using Rx Tx pins 8 and 9 on Arduino Uno board)
 AltSoftSerial xBee;
 
-using std::vector;
+//using std::vector;
 
-vector<int> zumos;
+bool hasRun = false;
+
+//vector<int> zumos;
 char value;
 
 int connectionCount = 0;
@@ -42,7 +45,9 @@ void setup()
   //  //Test UART and SoftwareSerial are working
   //  delay(2000);
   //  Serial.println("----- UART Serial -----");
-  //  xBee.println("----- Software Serial -----");
+    xBee.println("Sheeld First Broadcast");
+
+  
 }
 
 void loop()
@@ -62,28 +67,24 @@ void loop()
         break;
     }
   }
+
+  if(PushButton.isPressed()) {
+    moveZumo(1, 'w');
+    delay(2000);
+  }
+
+  //moveZumo(1, 'w');
+  //delay(1000);
+
 }
 
-void moveZumo(int connectionID, String dir) {
+void moveZumo(int connectionID, char dir) {
 
-  char val = 'n';
+  String toSend = String(connectionID) + ":" + dir;
+  
+  xBee.println('M');
+  xBee.println(toSend);
 
-  if (dir == "forward") {
-    val = 'w';
-  }
-  else if (dir == "left") {
-    val = 'a';
-  }
-  else if (dir == "backwards") {
-    val = 's';
-  }
-  else if (dir == "right") {
-    val = 'd';
-  }
-
-  if (val != 'n') {
-    xBee.println(connectionID + ">" + val);
-  }
 }
 
 void submitScore() {
