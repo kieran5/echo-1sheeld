@@ -5,16 +5,10 @@
 
 #include <OneSheeld.h>
 #include <AltSoftSerial.h>
-//#include <ArduinoSTL.h>
 
 //Set up SoftwareSerial for our xBee comms (AltSoftSerial using Rx Tx pins 8 and 9 on Arduino Uno board)
 AltSoftSerial xBee;
 
-//using std::vector;
-
-bool hasRun = false;
-
-//vector<int> zumos;
 char value;
 
 int connectionCount = 0;
@@ -42,11 +36,7 @@ void setup()
   scoreRequest.setOnFailure(&onFailure);
   scoreRequest.addHeader("Content-Type", "application/json");
 
-  //  //Test UART and SoftwareSerial are working
-  //  delay(2000);
-  //  Serial.println("----- UART Serial -----");
-    xBee.println("Sheeld First Broadcast");
-
+  xBee.println("Sheeld First Broadcast");
   
 }
 
@@ -73,8 +63,6 @@ void loop()
     delay(2000);
   }
 
-  //moveZumo(1, 'w');
-  //delay(1000);
 
 }
 
