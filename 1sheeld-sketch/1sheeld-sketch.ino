@@ -39,10 +39,10 @@ void setup()
   scoreRequest.setOnFailure(&onFailure);
   scoreRequest.addHeader("Content-Type", "application/json");
 
-//  //Test UART and SoftwareSerial are working
-//  delay(2000);
-//  Serial.println("----- UART Serial -----");
-//  xBee.println("----- Software Serial -----");
+  //  //Test UART and SoftwareSerial are working
+  //  delay(2000);
+  //  Serial.println("----- UART Serial -----");
+  //  xBee.println("----- Software Serial -----");
 }
 
 void loop()
@@ -64,6 +64,28 @@ void loop()
   }
 }
 
+void moveZumo(int connectionID, String dir) {
+
+  char val = 'n';
+
+  if (dir == "forward") {
+    val = 'w';
+  }
+  else if (dir == "left") {
+    val = 'a';
+  }
+  else if (dir == "backwards") {
+    val = 's';
+  }
+  else if (dir == "right") {
+    val = 'd';
+  }
+
+  if (val != 'n') {
+    xBee.println(connectionID + ">" + val);
+  }
+}
+
 void submitScore() {
   //Print JSON object to terminal for debugging
   Terminal.println("Attempting to post:");
@@ -75,7 +97,7 @@ void submitScore() {
 }
 
 void onFailure (HttpResponse &res)
-{ 
+{
   //Do below on an unsuccessful HTTP request
   Terminal.println("Request failed");
   Terminal.println(res.getStatusCode());
@@ -83,7 +105,7 @@ void onFailure (HttpResponse &res)
 }
 
 void onSuccess (HttpResponse &res)
-{ 
+{
   //Do below on a successful HTTP request
   Terminal.println("Request succeeded");
   Terminal.println(res.getStatusCode());
