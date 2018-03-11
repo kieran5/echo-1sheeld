@@ -21,9 +21,7 @@ int reqId = -2;
 String req = "";
 String motor;
 char value;
-char reqChar;
-
-String myAddress = "01";
+char reqCommand;
 
 void setup()
 {
@@ -63,70 +61,21 @@ void loop()
         String idString = Serial.readStringUntil(':');
         reqId = idString.toInt();
         req = Serial.readString();
-        reqChar = req.charAt(0);
-
-        Serial.println(reqChar);
+        reqCommand = req.charAt(0);
        
     }
 
     if (reqId == myId) {
-      Serial.println("hit");
       //request was for us...
-      if(reqChar == 'w') {
+      if(reqCommand == 'w') {
         motors.setSpeeds(100, 100);
         delay(2500);
-        motors.setSpeeds(0, 0); 
-
-        
+        motors.setSpeeds(0, 0);         
       }
 
+      // Reset request variables ready for next request
       req = "";
       reqId = -2;
     }
   }
 }
-
-
-
-//  //first element is the zumo identifier, second is WASD command
-//  char myString[2];
-//  motor.toCharArray(myString, 2);
-//
-//  char idSignal = myString[0];
-//  char wasdSignal = myString[1];
-//
-//  Serial.println("First element: " + myString[0]);
-//  Serial.println("Second element: " + myString[1]);
-//
-//  if (zumoId == idSignal) {
-//    switch (wasdSignal)
-//    {
-//      case 'w':
-//        motors.setLeftSpeed(lms);
-//        motors.setRightSpeed(rms);
-//        break;
-//      case 'a':
-//        motors.setLeftSpeed(-lms);
-//        motors.setRightSpeed(rms);
-//        break;
-//      case 's':
-//        motors.setLeftSpeed(-lms);
-//        motors.setRightSpeed(-rms);
-//        break;
-//      case 'd':
-//        motors.setLeftSpeed(lms);
-//        motors.setRightSpeed(-rms);
-//        break;
-//      case 'q':
-//        motors.setLeftSpeed(0);
-//        motors.setRightSpeed(0);
-//        break;
-//    }
-//
-//    delay(5000);
-//  }
-//}
-
-
-
-
