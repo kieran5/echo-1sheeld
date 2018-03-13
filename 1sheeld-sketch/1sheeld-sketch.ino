@@ -26,8 +26,9 @@ String jsonObject = "{\"nickname\": \"" + nickname + "\", \"score\": " + (String
 HttpRequest scoreRequest("https://kwillis.eu/hiscores");
 
 // Voice recognition
-bool voiceCommandActive = false;
+bool gameStarted = false;
 // Commands to be recognised by Zumos
+const char startGameCommand[] = "start game";
 const char forwardCommand[] = "forward";
 const char backwardCommand[] = "backward";
 const char leftCommand[] = "left";
@@ -50,69 +51,79 @@ void setup()
   scoreRequest.addHeader("Content-Type", "application/json");
 
   xBee.println("Sheeld First Broadcast");
+  
+  
+  while(!gameStarted) {
+      VoiceRecognition.start();
+      value = (char) xBee.read();
 
-  //VoiceRecognition.start();
+      if (VoiceRecognition.isNewCommandReceived()) {
+        if(strstr(VoiceRecognition.getLastCommand(), startGameCommand)) {
+          gameStarted = true;
+          break;           
+        }
+      }
+      else if(value == 'I') {
+        ++connectionCount;
+        delay(100);
+        xBee.write(connectionCount / 256);
+        xBee.write(connectionCount % 256);
+        xBee.write(0x0A);        
+      }    
+  }
+
+  TextToSpeech.say("Game is now starting.");
   
 }
 
 void loop()
 {
-  if (xBee.available() > 0) {
-
-    value = (char) xBee.read();
-
-    switch (value)
-    {
-      case 'I':
-        ++connectionCount;
-        delay(100);
-        xBee.write(connectionCount / 256);
-        xBee.write(connectionCount % 256);
-        xBee.write(0x0A);
-        break;
-    }
-  }
-
   // At least 2 players are required to play the game
-  if(connectionCount > 1) {
+  //if(connectionCount > 1) {
     
-    voiceCommandActive = true;
     VoiceRecognition.start();
     
     if(VoiceRecognition.isNewCommandReceived()) {
-      if(strstr(VoiceRecognition.getLastCommand(), forwardCommand) && voiceCommandActive) {
+      if(strstr(VoiceRecognition.getLastCommand(), forwardCommand) && gameStarted) {
         moveZumo(playerToMoveNext, 'w');
+        nextPlayersTurn();
         
       }
-      else if(strstr(VoiceRecognition.getLastCommand(), leftCommand) && voiceCommandActive) {
+      else if(strstr(VoiceRecognition.getLastCommand(), leftCommand) && gameStarted) {
         moveZumo(playerToMoveNext, 'a');
+        nextPlayersTurn();
                         
       }
-      else if(strstr(VoiceRecognition.getLastCommand(), backwardCommand) && voiceCommandActive) {
+      else if(strstr(VoiceRecognition.getLastCommand(), backwardCommand) && gameStarted) {
         moveZumo(playerToMoveNext, 's');
+        nextPlayersTurn();
                 
       }
-      else if(strstr(VoiceRecognition.getLastCommand(), rightCommand) && voiceCommandActive) {
+      else if(strstr(VoiceRecognition.getLastCommand(), rightCommand) && gameStarted) {
         moveZumo(playerToMoveNext, 'd');
+        nextPlayersTurn();
             
       }
-  
-      voiceCommandActive = false;
   
   
       // Update Zumo's current location (cell number)
   
       // Check if new cell contains a bomb
-      
-  
-      if(connectionCount == playerToMoveNext) {
-        playerToMoveNext = 1;
-      } else {
-        playerToMoveNext++;
-      }      
+            
     
     }  
+  //}
+}
+
+void nextPlayersTurn() {
+  if(connectionCount == playerToMoveNext) {
+    playerToMoveNext = 1;
+  } else {
+    playerToMoveNext++;
   }
+
+  TextToSpeech.say("Next Players Turn");
+  
 }
 
 void moveZumo(int connectionID, char dir) {
