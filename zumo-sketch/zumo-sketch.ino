@@ -60,8 +60,6 @@ void setup()
 
 void loop()
 {
-  turn(-90);
-  delay(1000);
   if (Serial.available() > 0) {
     value = (char) Serial.read();
 
@@ -81,6 +79,24 @@ void loop()
         motors.setSpeeds(100, 100);
         delay(2500);
         motors.setSpeeds(0, 0);         
+      }
+      else if(reqCommand == 'a') {
+        turn(90);
+        motors.setSpeeds(100, 100);
+        delay(2500);
+        motors.setSpeeds(0, 0);
+        
+      }
+      else if(reqCommand == 's') {
+        motors.setSpeeds(-100, -100);
+        delay(2500);
+        motors.setSpeeds(0, 0);
+      }
+      else if(reqCommand == 'd') {
+        turn(-90);
+        motors.setSpeeds(100, 100);
+        delay(2500);
+        motors.setSpeeds(0, 0);        
       }
 
       // Reset request variables ready for next request
