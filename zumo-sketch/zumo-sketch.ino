@@ -6,16 +6,26 @@
 #include <ZumoMotors.h>
 #include <Pushbutton.h>
 
+
+//for reflectance sensors
+#include <QTRSensors.h>
+#include <ZumoReflectanceSensorArray.h>
+
 //for gyro
 #include <L3G.h>
 #include <TurnSensor.h>
 #include <Utilities.h>
 
+#define QTR_THRESHOLD 1000; //desired color threshold for QTR sensors. 
+#define NUM_SENSORS 6 //no. of sensors that the ZumoReflectanceSensorArray has
 #define LED 13 //for the Zumo LED
 
 ZumoBuzzer buzzer;
 ZumoMotors motors;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
+ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
+
+unsigned int sensor_values[NUM_SENSORS]; //create an array which holds an int value for each one of our sensors to return a value to.
 
 L3G gyro;
 
@@ -60,6 +70,8 @@ void setup()
 
 void loop()
 {
+  sensors.read(sensor_values);
+  
   if (Serial.available() > 0) {
     value = (char) Serial.read();
 
