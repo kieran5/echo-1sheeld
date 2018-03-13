@@ -2,6 +2,8 @@
 #define INCLUDE_TERMINAL_SHIELD
 #define INCLUDE_INTERNET_SHIELD
 #define INCLUDE_PUSH_BUTTON_SHIELD
+#define INCLUDE_VOICE_RECOGNIZER_SHIELD
+#define INCLUDE_TEXT_TO_SPEECH_SHIELD
 
 #include <OneSheeld.h>
 #include <AltSoftSerial.h>
@@ -23,6 +25,17 @@ String jsonObject = "{\"nickname\": \"" + nickname + "\", \"score\": " + (String
 //Our API route for handling score data
 HttpRequest scoreRequest("https://kwillis.eu/hiscores");
 
+// Voice recognition
+bool voiceCommandActive = false;
+// Commands to be recognised by Zumos
+const char forwardCommand[] = "forward";
+const char backwardCommand[] = "backward";
+const char leftCommand[] = "left";
+const char rightCommand[] = "right";
+
+// Variable so the 1Sheeld knows who's turn it is next
+int playerToMoveNext = 1;
+
 void setup()
 {
   //Set up serial on 115200 baud rate for our 1Sheeld+
@@ -37,6 +50,8 @@ void setup()
   scoreRequest.addHeader("Content-Type", "application/json");
 
   xBee.println("Sheeld First Broadcast");
+
+  //VoiceRecognition.start();
   
 }
 
@@ -58,12 +73,48 @@ void loop()
     }
   }
 
-  if(PushButton.isPressed()) {
-    moveZumo(1, 'w');
-    delay(2000);
+  // At least 2 players are required to play the game
+  if(connectionCount > 1) {
+    
+    voiceCommandActive = true;
+    VoiceRecognition.start();
+    
+    if(VoiceRecognition.isNewCommandReceived()) {
+      if(strstr(VoiceRecognition.getLastCommand(), forwardCommand) && voiceCommandActive) {
+        moveZumo(playerToMoveNext, 'w');
+        
+      }
+      else if(strstr(VoiceRecognition.getLastCommand(), leftCommand) && voiceCommandActive) {
+        moveZumo(playerToMoveNext, 'a');
+        moveZumo(playerToMoveNext, 'w');
+                        
+      }
+      else if(strstr(VoiceRecognition.getLastCommand(), backwardCommand) && voiceCommandActive) {
+        moveZumo(playerToMoveNext, 's');
+                
+      }
+      else if(strstr(VoiceRecognition.getLastCommand(), rightCommand) && voiceCommandActive) {
+        moveZumo(playerToMoveNext, 'd');
+        moveZumo(playerToMoveNext, 'w');
+            
+      }
+  
+      voiceCommandActive = false;
+  
+  
+      // Update Zumo's current location (cell number)
+  
+      // Check if new cell contains a bomb
+      
+  
+      if(connectionCount == playerToMoveNext) {
+        playerToMoveNext = 1;
+      } else {
+        playerToMoveNext++;
+      }      
+    
+    }  
   }
-
-
 }
 
 void moveZumo(int connectionID, char dir) {
