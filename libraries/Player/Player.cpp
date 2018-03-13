@@ -3,8 +3,8 @@
 Player::Player() {}
 
 Player::Player(const int& id, const String& nickname) {
-    this._playerID = id;
-    this._nickname = nickname;    
+    _playerID = id;
+    _nickname = nickname;    
 }
 
 int Player::getPlayerID() {
@@ -12,7 +12,7 @@ int Player::getPlayerID() {
 }
 
 void Player::setPlayerID(int id) {
-    this._playerID = id;
+    _playerID = id;
 }
 
 String Player::getNickname() {
@@ -20,7 +20,7 @@ String Player::getNickname() {
 }
 
 void Player::setNickname(String nickname) {
-    this._nickname = nickname;
+    _nickname = nickname;
 }
 
 int Player::getScore() {
@@ -28,5 +28,5 @@ int Player::getScore() {
 }
 
 void Player::setScore(int score) {
-    this._score = score;
+    _score = score;
 }
