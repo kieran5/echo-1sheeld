@@ -8,7 +8,10 @@
 #include <OneSheeld.h>
 #include <AltSoftSerial.h>
 #include <Player.h>
+#include <ArduinoSTL.h>
+#include <vector>
 
+using namespace std;
 
 //Set up SoftwareSerial for our xBee comms (AltSoftSerial using Rx Tx pins 8 and 9 on Arduino Uno board)
 AltSoftSerial xBee;
@@ -16,6 +19,8 @@ AltSoftSerial xBee;
 char value;
 
 int connectionCount = 0;
+
+vector<Player*> players;
 
 //Our player's name and their score
 String nickname = "";
@@ -72,16 +77,36 @@ void setup()
         xBee.write(connectionCount % 256);
         xBee.write(0x0A);
 
-        
+        delay(1000);
 
         TextToSpeech.say("Player " + String(connectionCount) + " say your name.");
+        
+        delay(2000);
 
-        VoiceRecognition.start();
-        if (VoiceRecognition.isNewCommandReceived()) {
-          String nickname = VoiceRecognition.getLastCommand();
+        bool nicknameAssigned = false;
+        while(!nicknameAssigned) {
+          VoiceRecognition.start();
+          if (VoiceRecognition.isNewCommandReceived()) {
+            
+            Terminal.println("New command received");
+            
+            String nickname = VoiceRecognition.getLastCommand();
+  
+            Terminal.println("yaname - " + nickname);
+  
+            Player* player = new Player(connectionCount, nickname);
+            players.push_back(player);
+  
+            int playerID = players[0]->getPlayerID();
+            String playerNickname = players[0]->getNickname();
+            TextToSpeech.say("Player " + String(playerID) + " is called " + playerNickname);
+            Terminal.println("Player " + String(playerID) + " is called " + playerNickname);
 
-          Player* player = new Player(connectionCount, nickname);
+            nicknameAssigned = true;
+            break;
+          }          
         }
+        
       }    
   }
 
