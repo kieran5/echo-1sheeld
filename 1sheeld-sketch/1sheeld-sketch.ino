@@ -7,6 +7,8 @@
 
 #include <OneSheeld.h>
 #include <AltSoftSerial.h>
+#include <Player.h>
+
 
 //Set up SoftwareSerial for our xBee comms (AltSoftSerial using Rx Tx pins 8 and 9 on Arduino Uno board)
 AltSoftSerial xBee;
@@ -68,7 +70,18 @@ void setup()
         delay(100);
         xBee.write(connectionCount / 256);
         xBee.write(connectionCount % 256);
-        xBee.write(0x0A);        
+        xBee.write(0x0A);
+
+        
+
+        TextToSpeech.say("Player " + String(connectionCount) + " say your name.");
+
+        VoiceRecognition.start();
+        if (VoiceRecognition.isNewCommandReceived()) {
+          String nickname = VoiceRecognition.getLastCommand();
+
+          Player* player = new Player(connectionCount, nickname);
+        }
       }    
   }
 
