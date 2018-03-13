@@ -1,41 +1,32 @@
 #include <Player.h>
 
-
-
 Player::Player() {}
 
-Player::Player(const int& id, const String& nickname)
-{
-    _playerID = id;
-    _nickname = nickname;    
+Player::Player(const int& id, const String& nickname) {
+    this._playerID = id;
+    this._nickname = nickname;    
 }
 
-void Player::setID(int id)
-{
-    _playerID = id;
-}
-
-int Player::getID()
-{
+int Player::getPlayerID() {
     return _playerID;
 }
 
-void Player::setNickname(String nickname)
-{
-    _nickname = nickname;
+void Player::setPlayerID(int id) {
+    this._playerID = id;
 }
 
-String Player::getNickname()
-{
+String Player::getNickname() {
     return _nickname;
 }
 
-void Player::setScore(int score)
-{
-    _score = score;
+void Player::setNickname(String nickname) {
+    this._nickname = nickname;
 }
 
-int Player::getScore()
-{
+int Player::getScore() {
     return _score;
+}
+
+void Player::setScore(int score) {
+    this._score = score;
 }

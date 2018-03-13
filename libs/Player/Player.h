@@ -8,13 +8,12 @@ class Player
     public:
         Player();
         Player(const int&, const String&);
-        void setID(int);
-        int getID();
+		int getPlayerID();
+        void setPlayerID(int);
         void setNickname(String);
         String getNickname();
         void setScore(int);
         int getScore();
-
     private:
         int _playerID;
         String _nickname;
