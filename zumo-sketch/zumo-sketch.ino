@@ -182,13 +182,13 @@ void advance() {
     }
     
     if (isOverLine(sensor_values[2]) && isOverLine(sensor_values[3])) {
-      isAtEnd = true
+      isAtEnd = true;
     }   
   }
   motors.setSpeeds(0, 0);
 }
 
 bool isOverLine(int sensorPin) {
-  return sensorPin > SENSOR_THRESHOLD;
+  return sensorPin > QTR_THRESHOLD;
 }
 
