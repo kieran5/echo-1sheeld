@@ -86,7 +86,6 @@ void loop()
       }
       else if(strstr(VoiceRecognition.getLastCommand(), leftCommand) && voiceCommandActive) {
         moveZumo(playerToMoveNext, 'a');
-        moveZumo(playerToMoveNext, 'w');
                         
       }
       else if(strstr(VoiceRecognition.getLastCommand(), backwardCommand) && voiceCommandActive) {
@@ -95,7 +94,6 @@ void loop()
       }
       else if(strstr(VoiceRecognition.getLastCommand(), rightCommand) && voiceCommandActive) {
         moveZumo(playerToMoveNext, 'd');
-        moveZumo(playerToMoveNext, 'w');
             
       }
   
