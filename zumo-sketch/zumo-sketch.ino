@@ -178,20 +178,18 @@ void moveForwardWithinBoundaries()
     while (isOverLine(sensor_values[0]) && !isOverLine(sensor_values[5])) //now if the leftmost sensor detects the border and the rightmost sensor does not, safe to assume it is not a dead end
     {
       sensors.read(sensor_values);
-      motors.setSpeeds(0, 100);
+      motors.setSpeeds(-150, 150);
     }
-    delay(150);
   }
   else if (isOverLine(sensor_values[5])) //same again for the other (rightmost) side of the Zumo...
   {
     while (isOverLine(sensor_values[5]) && !isOverLine(sensor_values[0]))
     {
       sensors.read(sensor_values);
-      motors.setSpeeds(100, 0);
+      motors.setSpeeds(150, -150);
 
     }
   }
-  delay(150);
 }
 
 
