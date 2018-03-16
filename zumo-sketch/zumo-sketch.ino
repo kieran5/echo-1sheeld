@@ -73,6 +73,7 @@ void loop()
     }
 
     if (reqId == myId) {
+      Serial.println("HIT");
       //request was for us...
       if (reqCommand == 'w') {
         advance();
@@ -95,6 +96,9 @@ void loop()
         delay(500);
         turn(-45);
         advance();
+      } else if (reqCommand == 'b') {
+        Serial.println("Buzzer to play");
+        buzzer.play(">g32>>c32");        
       }
 
       // Reset request variables ready for next request
