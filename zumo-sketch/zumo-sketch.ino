@@ -157,41 +157,12 @@ void advance()
     if (isOverLine(sensor_values[2]) && isOverLine(sensor_values[3])) {
       isAtEnd = true;
     }
-    if (isOverLine(sensor_values[0])) //if leftmost sensor detects the border
-    {
-      motors.setSpeeds(0, SPEED); //power right motor for 70ms and then stop (this is to make sure the sensors successfully detect a dead end)
-      delay(70);
-      motors.setSpeeds(0, 0);
-      sensors.read(sensor_values); //read sensor values
-
-      if (isOverLine(sensor_values[0]) && !isOverLine(sensor_values[5])) //now if the leftmost sensor detects the border and the rightmost sensor does not, safe to assume it is not a dead end
-      {
-        motors.setSpeeds(-SPEED, -SPEED); //reverse
-        delay(300); //for 200ms
-        motors.setSpeeds(SPEED, -SPEED); //then rotate right
-        delay(200); //for 200ms
-      }
-    }
-    else if (isOverLine(sensor_values[5])) //same again for the other (rightmost) side of the Zumo...
-    {
-      motors.setSpeeds(SPEED, 0);
-      delay(70);
-      motors.setSpeeds(0, 0);
-      sensors.read(sensor_values);
-
-      if (isOverLine(sensor_values[5]) && !isOverLine(sensor_values[0]))
-      {
-        motors.setSpeeds(-SPEED, -SPEED); //reverse
-        delay(300); //for 200ms
-        motors.setSpeeds(-SPEED, SPEED); //then rotate right
-        delay(200); //for 200ms
-      }
-    }
+    moveForwardWithinBoundaries();
   }
   motors.setSpeeds(0, 0);
   delay(250);
-  motors.setSpeeds(-SPEED, -SPEED);
-  delay(350);
+  motors.setSpeeds(-75, -75);
+  delay(250);
   motors.setSpeeds(0, 0);
 }
 
@@ -199,3 +170,29 @@ bool isOverLine(int sensorPin)
 {
   return sensorPin > QTR_THRESHOLD;
 }
+
+void moveForwardWithinBoundaries()
+{
+  if (isOverLine(sensor_values[0])) //if leftmost sensor detects the border
+  {
+    while (isOverLine(sensor_values[0]) && !isOverLine(sensor_values[5])) //now if the leftmost sensor detects the border and the rightmost sensor does not, safe to assume it is not a dead end
+    {
+      sensors.read(sensor_values);
+      motors.setSpeeds(0, 100);
+    }
+    delay(150);
+  }
+  else if (isOverLine(sensor_values[5])) //same again for the other (rightmost) side of the Zumo...
+  {
+    while (isOverLine(sensor_values[5]) && !isOverLine(sensor_values[0]))
+    {
+      sensors.read(sensor_values);
+      motors.setSpeeds(100, 0);
+
+    }
+  }
+  delay(150);
+}
+
+
+
