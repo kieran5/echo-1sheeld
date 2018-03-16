@@ -45,10 +45,9 @@ int gameMatrix[4][4][2]; //the 3dimensional array that holds the game state
 //[1] 0 or empty or a bomb's ID
 
 int zumoDetails[4][3]; //a 2 dimensional array to hold zumo details, limited to 2 to keep memory usage minimal
-//[0] zumo ID
-//[1] Zumo orientation NESW as 1234
-//[2] Does it have a bomb, 0 for no, 1 for yes
-//[3] Score
+//[0] Zumo orientation NESW as 1234
+//[1] Does it have a bomb, 0 for no, 1 for yes
+//[2] Score
 
 
 
@@ -302,9 +301,13 @@ bool containsBomb(int x, int y) {
 }
 
 void setZumo(int playerID) {
+  //set te zumo up in the right column
   gameMatrix[playerID - 1][0][0] = playerID;
+  //set the orientation
   zumoDetails[playerID - 1][0] = 1;
+  //give it a bomb
   zumoDetails[playerID - 1][1] = 1;
+  //reset the score
   zumoDetails[playerID - 1][2] = 0;
 }
 
