@@ -110,10 +110,10 @@ void setup()
 
 void loop()
 {
-  if(PushButton.isPressed()) {
+  /*if(PushButton.isPressed()) {
     Terminal.println("Dropped bomb.");
     setBomb(currentPlayer);
-  }
+  }*/
   
   VoiceRecognition.start();
 
