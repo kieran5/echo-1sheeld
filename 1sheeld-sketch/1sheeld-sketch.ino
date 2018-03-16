@@ -37,7 +37,7 @@ const char leftCommand[] = "left";
 const char rightCommand[] = "right";
 
 // Variable so the 1Sheeld knows who's turn it is next
-int playerToMoveNext = 1;
+int currentPlayer = 1;
 
 
 int gameMatrix[4][4][2]; //the 3dimensional array that holds the game state
@@ -92,8 +92,8 @@ void setup()
               Player* player = new Player(connectionCount, nickname);
               players.push_back(player);
               nickAssigned = true;
+              setZumo(connectionCount);
               TextToSpeech.say("Successfully registered, thanks.");
-              Terminal.println("true");
             } else {
               Terminal.println("false");
             }
@@ -110,31 +110,65 @@ void setup()
 
 void loop()
 {
+  if(PushButton.isPressed()) {
+    Terminal.println("Dropped bomb.");
+    setBomb(currentPlayer);
+  }
+  
   VoiceRecognition.start();
 
   if (VoiceRecognition.isNewCommandReceived()) {
     if (strstr(VoiceRecognition.getLastCommand(), forwardCommand)) {
-      moveZumo(playerToMoveNext, 'w');
-      delay(3000);
-      nextPlayersTurn();
-
+      if (canMove(currentPlayer)) {
+        moveZumo(currentPlayer, 'w');
+        delay(3000);
+        nextPlayersTurn();
+      }
+      else {
+        TextToSpeech.say("Invalid move");
+      }
     }
     else if (strstr(VoiceRecognition.getLastCommand(), leftCommand)) {
-      moveZumo(playerToMoveNext, 'a');
-      delay(3000);
-      nextPlayersTurn();
+      setOrientation(currentPlayer, 'l');
+
+      if (canMove(currentPlayer)) {
+        moveZumo(currentPlayer, 'a');
+        delay(3000);
+        nextPlayersTurn();
+      }
+      else {
+        TextToSpeech.say("Invalid move");
+        setOrientation(currentPlayer, 'r');
+      }
 
     }
     else if (strstr(VoiceRecognition.getLastCommand(), backwardCommand)) {
-      moveZumo(playerToMoveNext, 's');
-      delay(3000);
-      nextPlayersTurn();
+      setOrientation(currentPlayer, 'l');
+      setOrientation(currentPlayer, 'l');
 
+      if (canMove(currentPlayer)) {
+        moveZumo(currentPlayer, 's');
+        delay(3000);
+        nextPlayersTurn();
+      }
+      else {
+        TextToSpeech.say("Invalid move");
+        setOrientation(currentPlayer, 'r');
+        setOrientation(currentPlayer, 'r');
+      }
     }
     else if (strstr(VoiceRecognition.getLastCommand(), rightCommand)) {
-      moveZumo(playerToMoveNext, 'd');
-      delay(3000);
-      nextPlayersTurn();
+      setOrientation(currentPlayer, 'r');
+
+      if (canMove(currentPlayer)) {
+        moveZumo(currentPlayer, 'd');
+        delay(3000);
+        nextPlayersTurn();
+      }
+      else {
+        TextToSpeech.say("Invalid move");
+        setOrientation(currentPlayer, 'l');
+      }
 
     }
 
@@ -149,61 +183,23 @@ void loop()
 }
 
 void nextPlayersTurn() {
-  if (connectionCount == playerToMoveNext) {
+  if (connectionCount == currentPlayer) {
     TextToSpeech.say("Player 1 Turn");
     delay(1000);
-    playerToMoveNext = 1;
+    currentPlayer = 1;
   } else {
     TextToSpeech.say("Next Players Turn");
     delay(1000);
-    playerToMoveNext++;
+    currentPlayer++;
   }
 }
 
-void moveZumo(int connectionID, char dir)
+void moveZumo(int playerID, char dir)
 {
-
-  String toSend = String(connectionID) + ":" + dir;
+  String toSend = String(playerID) + ":" + dir;
   xBee.println('M');
   xBee.println(toSend);
-}
 
-void submitScore(int playerID)
-{
-  //Our player's name and their score
-  String nickname = players[playerID-1]->getNickname();
-  int score = zumoDetails[playerID-1][2];
-
-  //A string to construct a JSON object containing users nickname and score, so we can make API request with data
-  String jsonObject = "{\"nickname\": \"" + nickname + "\", \"score\": " + (String)score + "}";
-
-  //Print JSON object to terminal for debugging
-  Terminal.println("Attempting to post:");
-  Terminal.println(&(jsonObject)[0]);
-
-  //Add data to our HTTP request and post to our API
-  scoreRequest.addRawData(&(jsonObject)[0]);
-  Internet.performPost(scoreRequest);
-}
-
-void onFailure(HttpResponse& res)
-{
-  //Do below on an unsuccessful HTTP request
-  Terminal.println("Request failed");
-  Terminal.println(res.getStatusCode());
-  Terminal.println(res.getTotalBytesCount());
-}
-
-void onSuccess(HttpResponse& res)
-{
-  //Do below on a successful HTTP request
-  Terminal.println("Request succeeded");
-  Terminal.println(res.getStatusCode());
-  Terminal.println(res.getTotalBytesCount());
-}
-
-//should be called after the zumo has physically moved. returns true if the move is safe, returns false if the zumo is dead.
-bool zumoHasMoved(int playerID) {
   int newX;
   int newY;
 
@@ -267,11 +263,15 @@ bool zumoHasMoved(int playerID) {
 
           //remove their zumo from the grid
           gameMatrix[x][y][0] = 0;
+          delay(2000);
+          xBee.println('M');
+          toSend = String(playerID) + ":b";
+          xBee.println(toSend);
 
           //the current player's zumo is dead. Post their score.
           postScore(playerID, zumoDetails[playerID - 1][2]);
 
-          return false;
+          return;
         }
         //if you haven't hit a bomb
         //move the representation of the zumo to the new square
@@ -282,14 +282,45 @@ bool zumoHasMoved(int playerID) {
         //give a point for surviving a turn
         zumoDetails[playerID - 1][2] = zumoDetails[playerID - 1][2] + 1;
 
-        return true;
+        return;
       }
     }
   }
 }
 
+void submitScore(int playerID)
+{
+  //Our player's name and their score
+  String nickname = players[playerID - 1]->getNickname();
+  int score = zumoDetails[playerID - 1][2];
 
+  //A string to construct a JSON object containing users nickname and score, so we can make API request with data
+  String jsonObject = "{\"nickname\": \"" + nickname + "\", \"score\": " + (String)score + "}";
 
+  //Print JSON object to terminal for debugging
+  Terminal.println("Attempting to post:");
+  Terminal.println(&(jsonObject)[0]);
+
+  //Add data to our HTTP request and post to our API
+  scoreRequest.addRawData(&(jsonObject)[0]);
+  Internet.performPost(scoreRequest);
+}
+
+void onFailure(HttpResponse& res)
+{
+  //Do below on an unsuccessful HTTP request
+  Terminal.println("Request failed");
+  Terminal.println(res.getStatusCode());
+  Terminal.println(res.getTotalBytesCount());
+}
+
+void onSuccess(HttpResponse& res)
+{
+  //Do below on a successful HTTP request
+  Terminal.println("Request succeeded");
+  Terminal.println(res.getStatusCode());
+  Terminal.println(res.getTotalBytesCount());
+}
 
 //returns true if the co-ordinates contain a bomb, and false if they do not
 bool containsBomb(int x, int y) {
@@ -413,7 +444,7 @@ bool canMove(int playerID) {
   {
     for (int y = 0; y < 4; y++)
     {
-      if (gameMatrix[x][y][1] == playerID) {
+      if (gameMatrix[x][y][0] == playerID) {
         if ((y == 3 && zumoDetails[playerID - 1][0] == 1) ||
             (x == 3 && zumoDetails[playerID - 1][0] == 2) ||
             (y == 0 && zumoDetails[playerID - 1][0] == 3) ||
