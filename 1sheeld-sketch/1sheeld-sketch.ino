@@ -43,7 +43,7 @@ int currentPlayer = 1;
 
 int gameMatrix[4][4][2]; //the 3dimensional array that holds the game state
 //[0] 0 for empty or a zumo's ID
-//[1] 0 or empty or a bomb's ID
+//[1] 0 for empty or a bomb's ID
 
 int zumoDetails[4][3]; //a 2 dimensional array to hold zumo details, limited to 2 to keep memory usage minimal
 //[0] Zumo orientation NESW as 1234
@@ -57,13 +57,13 @@ unsigned long lastConnectedTime = millis();
 
 void setup()
 {
-  //Set up HTTP request for RESTful API calls
-  scoreRequest.setOnSuccess(&onSuccess);
-  scoreRequest.setOnFailure(&onFailure);
-  scoreRequest.addHeader("Content-Type", "application/json");
-
   //Set up serial on 115200 baud rate for our 1Sheeld+
   OneSheeld.begin();
+
+//  //Set up HTTP request for RESTful API calls
+//  scoreRequest.setOnSuccess(&onSuccess);
+//  scoreRequest.setOnFailure(&onFailure);
+//  scoreRequest.addHeader("Content-Type", "application/json");
 
   //Set up our xBee on 9600 baud rate (needs to be at a lower baud rate than our UART serial, as our UART is handling lock interrupts faster
   xBee.begin(9600);
@@ -109,13 +109,12 @@ void setup()
   String s = String(connectionCount);
   TextToSpeech.say(s + "players connected");
   delay(4000);
+  VoiceRecognition.start();
 
 }
 
 void loop()
 {
-  VoiceRecognition.start();
-
   if (VoiceRecognition.isNewCommandReceived()) {
     if (strstr(VoiceRecognition.getLastCommand(), bombCommand)) {
       setBomb(currentPlayer);
@@ -184,7 +183,6 @@ void loop()
   }
 
   if(PushButton.isPressed()) {
-    Terminal.println("Dropped bomb.");
     setBomb(currentPlayer);
   }  
 }
@@ -199,6 +197,8 @@ void nextPlayersTurn() {
     delay(1000);
     currentPlayer++;
   }
+
+  VoiceRecognition.start();
 }
 
 void moveZumo(int playerID, char dir)
@@ -297,19 +297,22 @@ void moveZumo(int playerID, char dir)
 
 void submitScore(int playerID)
 {
+  scoreRequest.setOnSuccess(&onSuccess);
+  scoreRequest.setOnFailure(&onFailure);
+  scoreRequest.addHeader("Content-Type", "application/json");
   //Our player's name and their score
-  String nickname = players[playerID - 1]->getNickname();
-  int score = zumoDetails[playerID - 1][2];
-
+  String nickname = players[playerID-1]->getNickname();
+  int score = players[playerID-1]->getScore();
+  
   //A string to construct a JSON object containing users nickname and score, so we can make API request with data
-  String jsonObject = "{\"nickname\": \"" + nickname + "\", \"score\": " + (String)score + "}";
+  String jsonObject = "{\"nickname\": \"" + nickname + "\", \"score\": " + String(score) + "}";
 
   //Print JSON object to terminal for debugging
-  Terminal.println("Attempting to post:");
   Terminal.println(&(jsonObject)[0]);
 
   //Add data to our HTTP request and post to our API
   scoreRequest.addRawData(&(jsonObject)[0]);
+  
   Internet.performPost(scoreRequest);
 }
 
