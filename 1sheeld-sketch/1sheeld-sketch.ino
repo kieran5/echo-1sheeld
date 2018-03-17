@@ -35,6 +35,7 @@ const char forwardCommand[] = "forward";
 const char backwardCommand[] = "backward";
 const char leftCommand[] = "left";
 const char rightCommand[] = "right";
+const char bombCommand[] = "bomb";
 
 // Variable so the 1Sheeld knows who's turn it is next
 int currentPlayer = 1;
@@ -94,6 +95,8 @@ void setup()
               nickAssigned = true;
               setZumo(connectionCount);
               TextToSpeech.say("Successfully registered, thanks.");
+              Terminal.println(player->getPlayerID());
+              Terminal.println(player->getNickname());
             } else {
               Terminal.println("false");
             }
@@ -103,22 +106,21 @@ void setup()
       }
     }
   }
-  TextToSpeech.say(String(connectionCount) + " players connected, the game will start now.");
+  String s = String(connectionCount);
+  TextToSpeech.say(s + "players connected");
   delay(4000);
 
 }
 
 void loop()
 {
-  /*if(PushButton.isPressed()) {
-    Terminal.println("Dropped bomb.");
-    setBomb(currentPlayer);
-  }*/
-  
   VoiceRecognition.start();
 
   if (VoiceRecognition.isNewCommandReceived()) {
-    if (strstr(VoiceRecognition.getLastCommand(), forwardCommand)) {
+    if (strstr(VoiceRecognition.getLastCommand(), bombCommand)) {
+      setBomb(currentPlayer);
+    }
+    else if (strstr(VoiceRecognition.getLastCommand(), forwardCommand)) {
       if (canMove(currentPlayer)) {
         moveZumo(currentPlayer, 'w');
         delay(3000);
@@ -180,6 +182,11 @@ void loop()
     return;
 
   }
+
+  if(PushButton.isPressed()) {
+    Terminal.println("Dropped bomb.");
+    setBomb(currentPlayer);
+  }  
 }
 
 void nextPlayersTurn() {

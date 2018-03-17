@@ -73,30 +73,24 @@ void loop()
     }
 
     if (reqId == myId) {
-      Serial.println("HIT");
+      //Serial.println("HIT");
       //request was for us...
       if (reqCommand == 'w') {
         advance();
-      } else if (reqCommand == 'a') {
-        turn(45);
-        delay(500);
-        turn(45);
+      } 
+      else if (reqCommand == 'a') {
+        turn(90);
         advance();
-      } else if (reqCommand == 's') {
-        turn(45);
-        delay(500);
-        turn(45);
-        delay(500);
-        turn(45);
-        delay(500);
-        turn(45);
+      } 
+      else if (reqCommand == 's') {
+        turn(180);
         advance();
-      } else if (reqCommand == 'd') {
-        turn(-45);
-        delay(500);
-        turn(-45);
+      } 
+      else if (reqCommand == 'd') {
+        turn(-90);
         advance();
-      } else if (reqCommand == 'b') {
+      } 
+      else if (reqCommand == 'b') {
         Serial.println("Buzzer to play");
         buzzer.play(">g32>>c32");        
       }
@@ -110,12 +104,6 @@ void loop()
 
 void turn(int target)
 {
-
-  if (target > 0)
-    Serial.println("turning anti-clockwise");
-  else
-    Serial.println("turning clockwise");
-
   turnSensorReset();
   int32_t currHeading = Utilities::wrapAngle(turnSensorUpdate());
   int32_t targetAngle = Utilities::wrapAngle(currHeading + target);
