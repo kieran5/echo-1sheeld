@@ -373,6 +373,7 @@ void setBomb(int playerID) {
 //posts a score. is called when a zumo dies, needs to be called for the last man standing, we need to figure out how to tell when the last man is standing.
 void postScore(int playerID, int playerScore)
 {
+  players[playerID-1]->setScore(playerScore);
   submitScore(playerID);
 
   //check if there's a last man standing
