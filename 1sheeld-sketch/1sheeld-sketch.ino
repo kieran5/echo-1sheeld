@@ -127,6 +127,8 @@ void loop()
       }
       else {
         TextToSpeech.say("Invalid move");
+        delay(1000);
+        VoiceRecognition.start();
       }
     }
     else if (strstr(VoiceRecognition.getLastCommand(), leftCommand)) {
@@ -140,6 +142,8 @@ void loop()
       else {
         TextToSpeech.say("Invalid move");
         setOrientation(currentPlayer, 'r');
+        delay(1000);
+        VoiceRecognition.start();
       }
 
     }
@@ -156,6 +160,8 @@ void loop()
         TextToSpeech.say("Invalid move");
         setOrientation(currentPlayer, 'r');
         setOrientation(currentPlayer, 'r');
+        delay(1000);
+        VoiceRecognition.start();
       }
     }
     else if (strstr(VoiceRecognition.getLastCommand(), rightCommand)) {
@@ -169,6 +175,8 @@ void loop()
       else {
         TextToSpeech.say("Invalid move");
         setOrientation(currentPlayer, 'l');
+        delay(1000);
+        VoiceRecognition.start();
       }
 
     }
@@ -459,7 +467,12 @@ bool canMove(int playerID) {
         if ((y == 3 && zumoDetails[playerID - 1][0] == 1) ||
             (x == 3 && zumoDetails[playerID - 1][0] == 2) ||
             (y == 0 && zumoDetails[playerID - 1][0] == 3) ||
-            (x == 0 && zumoDetails[playerID - 1][0] == 4)) {
+            (x == 0 && zumoDetails[playerID - 1][0] == 4) ||
+            (zumoDetails[playerID-1][0]== 1 && gameMatrix[x][y+1][0]!=0) ||
+            (zumoDetails[playerID-1][0]== 2 && gameMatrix[x+1][y][0]!=0) ||
+            (zumoDetails[playerID-1][0]== 3 && gameMatrix[x][y-1][0]!=0) ||
+            (zumoDetails[playerID-1][0]== 4 && gameMatrix[x-1][y][0]!=0)) 
+            {
           return false;
         }
       }
