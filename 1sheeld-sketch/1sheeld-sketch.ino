@@ -60,10 +60,10 @@ void setup()
   //Set up serial on 115200 baud rate for our 1Sheeld+
   OneSheeld.begin();
 
-//  //Set up HTTP request for RESTful API calls
-//  scoreRequest.setOnSuccess(&onSuccess);
-//  scoreRequest.setOnFailure(&onFailure);
-//  scoreRequest.addHeader("Content-Type", "application/json");
+  //  //Set up HTTP request for RESTful API calls
+  //  scoreRequest.setOnSuccess(&onSuccess);
+  //  scoreRequest.setOnFailure(&onFailure);
+  //  scoreRequest.addHeader("Content-Type", "application/json");
 
   //Set up our xBee on 9600 baud rate (needs to be at a lower baud rate than our UART serial, as our UART is handling lock interrupts faster
   xBee.begin(9600);
@@ -182,9 +182,9 @@ void loop()
 
   }
 
-  if(PushButton.isPressed()) {
+  if (PushButton.isPressed()) {
     setBomb(currentPlayer);
-  }  
+  }
 }
 
 void nextPlayersTurn() {
@@ -301,9 +301,9 @@ void submitScore(int playerID)
   scoreRequest.setOnFailure(&onFailure);
   scoreRequest.addHeader("Content-Type", "application/json");
   //Our player's name and their score
-  String nickname = players[playerID-1]->getNickname();
-  int score = players[playerID-1]->getScore();
-  
+  String nickname = players[playerID - 1]->getNickname();
+  int score = players[playerID - 1]->getScore();
+
   //A string to construct a JSON object containing users nickname and score, so we can make API request with data
   String jsonObject = "{\"nickname\": \"" + nickname + "\", \"score\": " + String(score) + "}";
 
@@ -312,7 +312,7 @@ void submitScore(int playerID)
 
   //Add data to our HTTP request and post to our API
   scoreRequest.addRawData(&(jsonObject)[0]);
-  
+
   Internet.performPost(scoreRequest);
 }
 
@@ -373,8 +373,7 @@ void setBomb(int playerID) {
 //posts a score. is called when a zumo dies, needs to be called for the last man standing, we need to figure out how to tell when the last man is standing.
 void postScore(int playerID, int playerScore)
 {
-  players[playerID-1]->setScore(playerScore);
-  submitScore(playerID);
+
 
   //check if there's a last man standing
   int count = 0;
@@ -419,7 +418,8 @@ void postScore(int playerID, int playerScore)
     //remove it from the game matrix
     gameMatrix[lastMansX][lastMansY][0] = 0;
     //post its score
-    postScore(lastZumo, zumoDetails[lastZumo - 1][2]);
+    players[lastZumo - 1]->setScore(zumoDetails[lastZumo - 1][2]);
+    submitScore(lastZumo);
     //do a victory dance or something?
     //victory(playerID);
   }
