@@ -106,7 +106,7 @@ void setup()
     }
   }
   String s = String(connectionCount);
-  TextToSpeech.say(s + "players connected. Player 1 it is your turn.");
+  TextToSpeech.say(s + "players connected. Player 1, it's your turn.");
   delay(4000);
   VoiceRecognition.start();
 
@@ -425,7 +425,7 @@ void postScore(int playerID, int playerScore)
     delay(5000);
 
     // Game over
-    TextToSpeech.say("Game over. Have a nice day.");
+    TextToSpeech.say("Game over. Player" + String(lastZumo) + " wins!");
 
     delay(3000);
     xBee.println('M');
