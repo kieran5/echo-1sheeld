@@ -81,7 +81,7 @@ void setup()
 
           bool nickAssigned = false;
 
-          TextToSpeech.say("Say you name now.");
+          TextToSpeech.say("Say your name now.");
           delay(2000); //so john can talk without affecting voice recognition
           VoiceRecognition.start();
           delay(5000); //so player has time to say there name after start()
@@ -94,8 +94,8 @@ void setup()
               players.push_back(player);
               nickAssigned = true;
               setZumo(connectionCount);
-              TextToSpeech.say("Successfully registered, thanks.");
-              
+              TextToSpeech.say("Player " + String(connectionCount) + " successfully registered.");
+
             } else {
               Terminal.println("false");
             }
@@ -106,7 +106,7 @@ void setup()
     }
   }
   String s = String(connectionCount);
-  TextToSpeech.say(s + "players connected");
+  TextToSpeech.say(s + "players connected. Player 1 it is your turn.");
   delay(4000);
   VoiceRecognition.start();
 
@@ -124,11 +124,6 @@ void loop()
         delay(3000);
         nextPlayersTurn();
       }
-      else {
-        TextToSpeech.say("Invalid move");
-        delay(1000);
-        VoiceRecognition.start();
-      }
     }
     else if (strstr(VoiceRecognition.getLastCommand(), leftCommand)) {
       setOrientation(currentPlayer, 'l');
@@ -139,10 +134,7 @@ void loop()
         nextPlayersTurn();
       }
       else {
-        TextToSpeech.say("Invalid move");
         setOrientation(currentPlayer, 'r');
-        delay(1000);
-        VoiceRecognition.start();
       }
 
     }
@@ -156,11 +148,8 @@ void loop()
         nextPlayersTurn();
       }
       else {
-        TextToSpeech.say("Invalid move");
         setOrientation(currentPlayer, 'r');
         setOrientation(currentPlayer, 'r');
-        delay(1000);
-        VoiceRecognition.start();
       }
     }
     else if (strstr(VoiceRecognition.getLastCommand(), rightCommand)) {
@@ -172,10 +161,7 @@ void loop()
         nextPlayersTurn();
       }
       else {
-        TextToSpeech.say("Invalid move");
         setOrientation(currentPlayer, 'l');
-        delay(1000);
-        VoiceRecognition.start();
       }
 
     }
@@ -203,11 +189,11 @@ void nextPlayersTurn() {
 
   if (players[currentPlayer - 1]->isAlive()) {
     if (currentPlayer == 1) {
-      TextToSpeech.say("Player 1 Turn");
+      TextToSpeech.say("Player 1's turn");
       delay(1000);
     }
     else {
-      TextToSpeech.say("Next Players Turn");
+      TextToSpeech.say("Player " + String(currentPlayer) + "'s turn");
       delay(1000);
     }
 
@@ -437,13 +423,16 @@ void postScore(int playerID, int playerScore)
       }
     }
     delay(5000);
+
+    // Game over
+    TextToSpeech.say("Game over. Have a nice day.");
+
+    delay(3000);
     xBee.println('M');
     String sendVictory = String(lastZumo) + ":v";
     xBee.println(sendVictory);
 
-    // Game over
-    delay(2000);
-    TextToSpeech.say("Game Over. Have a nice day.");
+    
     delay(2000);
     //remove it from the game matrix
     gameMatrix[lastMansX][lastMansY][0] = 0;
@@ -454,8 +443,8 @@ void postScore(int playerID, int playerScore)
     //victory(playerID);
 
     delay(2000);
-    
-    
+
+
     // Enter endless while loop to terminate program
     while (true) {
 
@@ -497,12 +486,21 @@ bool canMove(int playerID) {
         if ((y == 3 && zumoDetails[playerID - 1][0] == 1) ||
             (x == 3 && zumoDetails[playerID - 1][0] == 2) ||
             (y == 0 && zumoDetails[playerID - 1][0] == 3) ||
-            (x == 0 && zumoDetails[playerID - 1][0] == 4) ||
-            (zumoDetails[playerID - 1][0] == 1 && gameMatrix[x][y + 1][0] != 0) ||
-            (zumoDetails[playerID - 1][0] == 2 && gameMatrix[x + 1][y][0] != 0) ||
-            (zumoDetails[playerID - 1][0] == 3 && gameMatrix[x][y - 1][0] != 0) ||
-            (zumoDetails[playerID - 1][0] == 4 && gameMatrix[x - 1][y][0] != 0))
+            (x == 0 && zumoDetails[playerID - 1][0] == 4))
         {
+          TextToSpeech.say("Invalid move. You can't leave the grid.");
+          delay(1000);
+          VoiceRecognition.start();
+          return false;
+        }
+        if ((zumoDetails[playerID - 1][0] == 1 && gameMatrix[x][y + 1][0] != 0) ||
+          (zumoDetails[playerID - 1][0] == 2 && gameMatrix[x + 1][y][0] != 0) ||
+          (zumoDetails[playerID - 1][0] == 3 && gameMatrix[x][y - 1][0] != 0) ||
+          (zumoDetails[playerID - 1][0] == 4 && gameMatrix[x - 1][y][0] != 0))
+        {
+          TextToSpeech.say("Invalid move. There is a player in the way.");
+          delay(1000);
+          VoiceRecognition.start();
           return false;
         }
       }
