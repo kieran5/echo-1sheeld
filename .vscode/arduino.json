@@ -1,6 +1,6 @@
 {
-    "port": "COM4",
-    "board": "arduino:avr:uno",
-    "sketch": "zumo-sketch\\zumo-sketch.ino",
+    "port": "COM8",
+    "board": "arduino:avr:leonardo",
+    "sketch": "1sheeld-sketch\\1sheeld-sketch.ino",
     "output": "../build"
 }

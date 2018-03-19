@@ -26,6 +26,21 @@ ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 
 unsigned int sensor_values[NUM_SENSORS]; //create an array which holds an int value for each one of our sensors to return a value to.
 
+#include <avr/pgmspace.h>
+
+
+const char victoryTune[] PROGMEM = "! O5 L16 agafaea dac+adaea fa<aa<bac#a dac#adaea f"
+                             "O6 dcd<b-d<ad<g d<f+d<gd<ad<b- d<dd<ed<f+d<g d<f+d<gd<ad"
+                             "L8 MS <b-d<b-d MLe-<ge-<g MSc<ac<a ML d<fd<f O5 MS b-gb-g"
+                             "ML >c#e>c#e MS afaf ML gc#gc# MS fdfd ML e<b-e<b-"
+                             "O6 L16ragafaea dac#adaea fa<aa<bac#a dac#adaea faeadaca"
+                             "<b-acadg<b-g egdgcg<b-g <ag<b-gcf<af dfcf<b-f<af"
+                             "<gf<af<b-e<ge c#e<b-e<ae<ge <fe<ge<ad<fd"
+                             "O5 e>ee>ef>df>d b->c#b->c#a>df>d e>ee>ef>df>d"
+                             "e>d>c#>db>d>c#b >c#agaegfe f O6 dc#dfdc#<b c#4";
+
+const char deathTune[] PROGMEM = "dd-c";
+
 L3G gyro;
 
 int myId = -1;
@@ -39,150 +54,153 @@ char reqCommand;
 
 void setup()
 {
-  //turn LED on and wait for button push before playing tune and handshake with processing
-  digitalWrite(LED, HIGH);
+    //turn LED on and wait for button push before playing tune and handshake with processing
+    digitalWrite(LED, HIGH);
 
-  Serial.begin(9600);
-  turnSensorSetup();
+    Serial.begin(9600);
+    turnSensorSetup();
 
-  button.waitForButton();
+    button.waitForButton();
 
-  digitalWrite(LED, LOW);
-  buzzer.play(">g32>>c32");
+    digitalWrite(LED, LOW);
+    buzzer.play(">g32>>c32");
 
-  Serial.println('I');
+    Serial.println('I');
 
-  myId = Serial.parseInt();
+    myId = Serial.parseInt();
 
-  Serial.println(myId);
+    Serial.println(myId);
 }
 
 void loop()
 {
-  sensors.read(sensor_values);
+    sensors.read(sensor_values);
 
-  if (Serial.available() > 0) {
-    value = (char)Serial.read();
+    if (Serial.available() > 0) {
+        value = (char)Serial.read();
 
-    switch (value) {
-      case 'M':
-        String idString = Serial.readStringUntil(':');
-        reqId = idString.toInt();
-        req = Serial.readString();
-        reqCommand = req.charAt(0);
+        switch (value) {
+        case 'M':
+            String idString = Serial.readStringUntil(':');
+            reqId = idString.toInt();
+            req = Serial.readString();
+            reqCommand = req.charAt(0);
+        }
+
+        if (reqId == myId) {
+            //Serial.println("HIT");
+            //request was for us...
+            if (reqCommand == 'w') {
+                advance();
+            } else if (reqCommand == 'a') {
+                turn(90);
+                advance();
+            } else if (reqCommand == 's') {
+                turn(180);
+                advance();
+            } else if (reqCommand == 'd') {
+                turn(-90);
+                advance();
+            } else if (reqCommand == 'b') {
+                doDeathSpin();
+            } else if (reqCommand == 'v') {
+                buzzer.playFromProgramSpace(victoryTune);
+            }
+
+                // Reset request variables ready for next request
+                req = "";
+            reqId = -2;
+        }
     }
-
-    if (reqId == myId) {
-      //Serial.println("HIT");
-      //request was for us...
-      if (reqCommand == 'w') {
-        advance();
-      } 
-      else if (reqCommand == 'a') {
-        turn(90);
-        advance();
-      } 
-      else if (reqCommand == 's') {
-        turn(180);
-        advance();
-      } 
-      else if (reqCommand == 'd') {
-        turn(-90);
-        advance();
-      } 
-      else if (reqCommand == 'b') {
-        Serial.println("Buzzer to play");
-        buzzer.play(">g32>>c32");        
-      }
-
-      // Reset request variables ready for next request
-      req = "";
-      reqId = -2;
-    }
-  }
 }
 
 void turn(int target)
 {
-  turnSensorReset();
-  int32_t currHeading = Utilities::wrapAngle(turnSensorUpdate());
-  int32_t targetAngle = Utilities::wrapAngle(currHeading + target);
-  float error, speed;
-  bool done = false;
-  while (!done) {
+    turnSensorReset();
+    int32_t currHeading = Utilities::wrapAngle(turnSensorUpdate());
+    int32_t targetAngle = Utilities::wrapAngle(currHeading + target);
+    float error, speed;
+    bool done = false;
+    while (!done) {
 
-    error = Utilities::wrapAngle(turnSensorUpdate() - targetAngle);
-    done = Utilities::inRange(fabs(error), (float) - 1, (float)1);
+        error = Utilities::wrapAngle(turnSensorUpdate() - targetAngle);
+        done = Utilities::inRange(fabs(error), (float)-1, (float)1);
 
-    speed = 150;
+        speed = 150;
 
-    if (error > 0) {
-      motors.setSpeeds(speed, -speed);
-    } else {
-      motors.setSpeeds(-speed, speed);
+        if (error > 0) {
+            motors.setSpeeds(speed, -speed);
+        } else {
+            motors.setSpeeds(-speed, speed);
+        }
     }
-  }
-  motors.setSpeeds(0, 0);
+    motors.setSpeeds(0, 0);
 }
 
 void advance()
 {
-  bool hasCrossedLine = false;
-  bool isAtEnd = false;
+    bool hasCrossedLine = false;
+    bool isAtEnd = false;
 
-  while (!isAtEnd) {
+    while (!isAtEnd) {
 
-    motors.setSpeeds(SPEED, SPEED);
+        motors.setSpeeds(SPEED, SPEED);
 
-    while (!hasCrossedLine) {
+        while (!hasCrossedLine) {
 
-      sensors.read(sensor_values);
+            sensors.read(sensor_values);
 
-      if (isOverLine(sensor_values[2]) && isOverLine(sensor_values[3])) {
-        delay(1000);
-        hasCrossedLine = true;
-      }
+            if (isOverLine(sensor_values[2]) && isOverLine(sensor_values[3])) {
+                delay(1000);
+                hasCrossedLine = true;
+            }
+        }
+
+        sensors.read(sensor_values);
+
+        if (isOverLine(sensor_values[2]) && isOverLine(sensor_values[3])) {
+            isAtEnd = true;
+        }
+        moveForwardWithinBoundaries();
     }
-
-    sensors.read(sensor_values);
-
-    if (isOverLine(sensor_values[2]) && isOverLine(sensor_values[3])) {
-      isAtEnd = true;
-    }
-    moveForwardWithinBoundaries();
-  }
-  motors.setSpeeds(0, 0);
-  delay(250);
-  motors.setSpeeds(-75, -75);
-  delay(250);
-  motors.setSpeeds(0, 0);
+    motors.setSpeeds(0, 0);
+    delay(250);
+    motors.setSpeeds(-75, -75);
+    delay(250);
+    motors.setSpeeds(0, 0);
 }
 
 bool isOverLine(int sensorPin)
 {
-  return sensorPin > QTR_THRESHOLD;
+    return sensorPin > QTR_THRESHOLD;
 }
 
 void moveForwardWithinBoundaries()
 {
-  if (isOverLine(sensor_values[0])) //if leftmost sensor detects the border
-  {
-    while (isOverLine(sensor_values[0]) && !isOverLine(sensor_values[5])) //now if the leftmost sensor detects the border and the rightmost sensor does not, safe to assume it is not a dead end
+    if (isOverLine(sensor_values[0])) //if leftmost sensor detects the border
     {
-      sensors.read(sensor_values);
-      motors.setSpeeds(-150, 150);
-    }
-  }
-  else if (isOverLine(sensor_values[5])) //same again for the other (rightmost) side of the Zumo...
-  {
-    while (isOverLine(sensor_values[5]) && !isOverLine(sensor_values[0]))
+        while (isOverLine(sensor_values[0]) && !isOverLine(sensor_values[5])) //now if the leftmost sensor detects the border and the rightmost sensor does not, safe to assume it is not a dead end
+        {
+            sensors.read(sensor_values);
+            motors.setSpeeds(-150, 150);
+        }
+    } else if (isOverLine(sensor_values[5])) //same again for the other (rightmost) side of the Zumo...
     {
-      sensors.read(sensor_values);
-      motors.setSpeeds(150, -150);
-
+        while (isOverLine(sensor_values[5]) && !isOverLine(sensor_values[0])) {
+            sensors.read(sensor_values);
+            motors.setSpeeds(150, -150);
+        }
     }
-  }
 }
 
-
-
+void doDeathSpin()
+{
+    buzzer.playFromProgramSpace(deathTune);
+    for (int i = 240; i > 0; i--) {
+        if ((i > 30 && i <= 90) || (i > 150 && i <= 210))
+            motors.setSpeeds(i, -i);
+        else
+            motors.setSpeeds(-i, i);
+        delay(30);
+    }
+}
