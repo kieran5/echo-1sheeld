@@ -295,7 +295,7 @@ void moveZumo(int playerID, char dir)
           toSend = String(playerID) + ":b";
           xBee.println(toSend);
 
-          players[playerID-1]->die();
+          players[playerID - 1]->die();
 
           //the current player's zumo is dead. Post their score.
           postScore(playerID, zumoDetails[playerID - 1][2]);
@@ -444,6 +444,15 @@ void postScore(int playerID, int playerScore)
     submitScore(lastZumo);
     //do a victory dance or something?
     //victory(playerID);
+
+    // Game over
+    delay(2000);
+    TextToSpeech.say("Game Over. Have a nice day.");
+    delay(2000);
+    // Enter endless while loop to terminate program
+    while (true) {
+
+    }
   }
 }
 
