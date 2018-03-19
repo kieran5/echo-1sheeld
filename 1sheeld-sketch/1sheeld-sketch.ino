@@ -197,16 +197,28 @@ void loop()
 
 void nextPlayersTurn() {
   if (connectionCount == currentPlayer) {
-    TextToSpeech.say("Player 1 Turn");
-    delay(1000);
     currentPlayer = 1;
   } else {
-    TextToSpeech.say("Next Players Turn");
-    delay(1000);
     currentPlayer++;
   }
 
-  VoiceRecognition.start();
+  if (players[currentPlayer - 1]->isAlive()) {
+    if (currentPlayer == 1) {
+      TextToSpeech.say("Player 1 Turn");
+      delay(1000);
+    }
+    else {
+      TextToSpeech.say("Next Players Turn");
+      delay(1000);
+    }
+
+    VoiceRecognition.start();
+  }
+  else {
+    nextPlayersTurn();
+  }
+
+
 }
 
 void moveZumo(int playerID, char dir)
@@ -282,6 +294,8 @@ void moveZumo(int playerID, char dir)
           xBee.println('M');
           toSend = String(playerID) + ":b";
           xBee.println(toSend);
+
+          players[playerID-1]->die();
 
           //the current player's zumo is dead. Post their score.
           postScore(playerID, zumoDetails[playerID - 1][2]);
@@ -468,11 +482,11 @@ bool canMove(int playerID) {
             (x == 3 && zumoDetails[playerID - 1][0] == 2) ||
             (y == 0 && zumoDetails[playerID - 1][0] == 3) ||
             (x == 0 && zumoDetails[playerID - 1][0] == 4) ||
-            (zumoDetails[playerID-1][0]== 1 && gameMatrix[x][y+1][0]!=0) ||
-            (zumoDetails[playerID-1][0]== 2 && gameMatrix[x+1][y][0]!=0) ||
-            (zumoDetails[playerID-1][0]== 3 && gameMatrix[x][y-1][0]!=0) ||
-            (zumoDetails[playerID-1][0]== 4 && gameMatrix[x-1][y][0]!=0)) 
-            {
+            (zumoDetails[playerID - 1][0] == 1 && gameMatrix[x][y + 1][0] != 0) ||
+            (zumoDetails[playerID - 1][0] == 2 && gameMatrix[x + 1][y][0] != 0) ||
+            (zumoDetails[playerID - 1][0] == 3 && gameMatrix[x][y - 1][0] != 0) ||
+            (zumoDetails[playerID - 1][0] == 4 && gameMatrix[x - 1][y][0] != 0))
+        {
           return false;
         }
       }
