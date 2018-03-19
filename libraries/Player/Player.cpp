@@ -4,7 +4,8 @@ Player::Player() {}
 
 Player::Player(const int& id, const String& nickname) {
     _playerID = id;
-    _nickname = nickname;    
+    _nickname = nickname;  
+	_alive = true;
 }
 
 int Player::getPlayerID() {
@@ -29,4 +30,12 @@ int Player::getScore() {
 
 void Player::setScore(int score) {
     _score = score;
+}
+
+bool Player::isAlive() {
+	return _alive;
+}
+
+void Player::die() {
+	_alive = false;
 }

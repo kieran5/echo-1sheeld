@@ -14,10 +14,13 @@ class Player
         String getNickname();
         void setScore(int);
         int getScore();
+		bool isAlive();
+		void die();
     private:
         int _playerID;
         String _nickname;
         int _score;
+		bool _alive;
 
 };
 #endif
