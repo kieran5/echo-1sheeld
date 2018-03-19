@@ -11,12 +11,12 @@
 #include <OneSheeld.h>
 #include <Player.h>
 
-using namespace std;
+
 
 //Set up SoftwareSerial for our xBee comms (AltSoftSerial using Rx Tx pins 8 and 9 on Arduino Uno board)
 AltSoftSerial xBee;
 
-vector<Player*> players;
+std::vector<Player*> players;
 
 char value;
 
@@ -30,7 +30,7 @@ HttpRequest scoreRequest("https://kwillis.eu/hiscores");
 // Voice recognition
 bool voiceCommandActive = false;
 // Commands to be recognised by Zumos
-const char startGameCommand[] = "start game";
+
 const char forwardCommand[] = "forward";
 const char backwardCommand[] = "backward";
 const char leftCommand[] = "left";
@@ -95,8 +95,7 @@ void setup()
               nickAssigned = true;
               setZumo(connectionCount);
               TextToSpeech.say("Successfully registered, thanks.");
-              Terminal.println(player->getPlayerID());
-              Terminal.println(player->getNickname());
+              
             } else {
               Terminal.println("false");
             }
@@ -322,6 +321,7 @@ void submitScore(int playerID)
   scoreRequest.setOnSuccess(&onSuccess);
   scoreRequest.setOnFailure(&onFailure);
   scoreRequest.addHeader("Content-Type", "application/json");
+  scoreRequest.setContentType("application/json");
   //Our player's name and their score
   String nickname = players[playerID - 1]->getNickname();
   int score = players[playerID - 1]->getScore();
@@ -329,7 +329,6 @@ void submitScore(int playerID)
   //A string to construct a JSON object containing users nickname and score, so we can make API request with data
   String jsonObject = "{\"nickname\": \"" + nickname + "\", \"score\": " + String(score) + "}";
 
-  //Print JSON object to terminal for debugging
   Terminal.println(&(jsonObject)[0]);
 
   //Add data to our HTTP request and post to our API
@@ -437,6 +436,15 @@ void postScore(int playerID, int playerScore)
         }
       }
     }
+    delay(5000);
+    xBee.println('M');
+    String sendVictory = String(lastZumo) + ":v";
+    xBee.println(sendVictory);
+
+    // Game over
+    delay(2000);
+    TextToSpeech.say("Game Over. Have a nice day.");
+    delay(2000);
     //remove it from the game matrix
     gameMatrix[lastMansX][lastMansY][0] = 0;
     //post its score
@@ -445,10 +453,9 @@ void postScore(int playerID, int playerScore)
     //do a victory dance or something?
     //victory(playerID);
 
-    // Game over
     delay(2000);
-    TextToSpeech.say("Game Over. Have a nice day.");
-    delay(2000);
+    
+    
     // Enter endless while loop to terminate program
     while (true) {
 
