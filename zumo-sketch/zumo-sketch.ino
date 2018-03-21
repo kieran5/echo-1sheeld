@@ -196,11 +196,8 @@ void moveForwardWithinBoundaries()
 void doDeathSpin()
 {
     buzzer.playFromProgramSpace(deathTune);
-    for (int i = 240; i > 0; i--) {
-        if ((i > 30 && i <= 90) || (i > 150 && i <= 210))
-            motors.setSpeeds(i, -i);
-        else
-            motors.setSpeeds(-i, i);
-        delay(30);
+    for (int i = 300; i > 0; i--) {
+        motors.setSpeeds(i, -i);
+        delay(10);
     }
 }
