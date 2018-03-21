@@ -5,15 +5,13 @@
 #define INCLUDE_VOICE_RECOGNIZER_SHIELD
 #define INCLUDE_TEXT_TO_SPEECH_SHIELD
 
-
 #include <AltSoftSerial.h>
 #include <ArduinoSTL.h>
 #include <OneSheeld.h>
 #include <Player.h>
 
 
-
-//Set up SoftwareSerial for our xBee comms (AltSoftSerial using Rx Tx pins 8 and 9 on Arduino Uno board)
+//Set up SoftwareSerial for our xBee comms (AltSoftSerial using Rx Tx pins 5 and 13 on Arduino Leonardo board)
 AltSoftSerial xBee;
 
 std::vector<Player*> players;
@@ -21,8 +19,6 @@ std::vector<Player*> players;
 char value;
 
 int connectionCount = 0;
-
-
 
 //Our API route for handling score data
 HttpRequest scoreRequest("https://kwillis.eu/hiscores");
@@ -40,30 +36,22 @@ const char bombCommand[] = "bomb";
 // Variable so the 1Sheeld knows who's turn it is next
 int currentPlayer = 1;
 
-
 int gameMatrix[4][4][2]; //the 3dimensional array that holds the game state
 //[0] 0 for empty or a zumo's ID
 //[1] 0 for empty or a bomb's ID
 
-int zumoDetails[4][3]; //a 2 dimensional array to hold zumo details, limited to 2 to keep memory usage minimal
+int zumoDetails[4][3]; //a 2 dimensional array to hold zumo details
 //[0] Zumo orientation NESW as 1234
 //[1] Does it have a bomb, 0 for no, 1 for yes
 //[2] Score
 
-
-
-
 unsigned long lastConnectedTime = millis();
+
 
 void setup()
 {
   //Set up serial on 115200 baud rate for our 1Sheeld+
   OneSheeld.begin();
-
-  //  //Set up HTTP request for RESTful API calls
-  //  scoreRequest.setOnSuccess(&onSuccess);
-  //  scoreRequest.setOnFailure(&onFailure);
-  //  scoreRequest.addHeader("Content-Type", "application/json");
 
   //Set up our xBee on 9600 baud rate (needs to be at a lower baud rate than our UART serial, as our UART is handling lock interrupts faster
   xBee.begin(9600);
@@ -82,9 +70,9 @@ void setup()
           bool nickAssigned = false;
 
           TextToSpeech.say("Say your name now.");
-          delay(2000); //so john can talk without affecting voice recognition
+          delay(2000); //so text to speech can talk without affecting voice recognition
           VoiceRecognition.start();
-          delay(5000); //so player has time to say there name after start()
+          delay(5000); //so player has time to say their name after start()
 
           while (!nickAssigned) {
 
@@ -109,8 +97,8 @@ void setup()
   TextToSpeech.say(s + "players connected. Player 1, it's your turn.");
   delay(4000);
   VoiceRecognition.start();
-
 }
+
 
 void loop()
 {
@@ -136,7 +124,6 @@ void loop()
       else {
         setOrientation(currentPlayer, 'r');
       }
-
     }
     else if (strstr(VoiceRecognition.getLastCommand(), backwardCommand)) {
       setOrientation(currentPlayer, 'l');
@@ -163,22 +150,14 @@ void loop()
       else {
         setOrientation(currentPlayer, 'l');
       }
-
     }
-
-    // Update Zumo's current location (cell number)
-
-    // Check if new cell contains a bomb
-
-
     return;
-
   }
-
   if (PushButton.isPressed()) {
     setBomb(currentPlayer);
   }
 }
+
 
 void nextPlayersTurn() {
   if (connectionCount == currentPlayer) {
@@ -186,7 +165,6 @@ void nextPlayersTurn() {
   } else {
     currentPlayer++;
   }
-
   if (players[currentPlayer - 1]->isAlive()) {
     if (currentPlayer == 1) {
       TextToSpeech.say("Player 1's turn");
@@ -202,10 +180,14 @@ void nextPlayersTurn() {
   else {
     nextPlayersTurn();
   }
-
-
 }
 
+/**
+   Update the position of the zumo in the matrix and check if it survives
+
+   @param playerID  Integer representing the zumo to be handled
+   @param dir  Char representing the direction of the zumo (unused?)
+*/
 void moveZumo(int playerID, char dir)
 {
   String toSend = String(playerID) + ":" + dir;
@@ -222,7 +204,6 @@ void moveZumo(int playerID, char dir)
     {
       if (gameMatrix[x][y][0] == playerID)
       {
-
         //set the co-ordinates that the zumo has moved to
         switch (zumoDetails[playerID - 1][0])
         {
@@ -243,21 +224,16 @@ void moveZumo(int playerID, char dir)
             newY = y;
             break;
         }
-
-
         if (containsBomb(newX, newY))
         {
           //take the id of the player who left the bomb
           int id = gameMatrix[newX][newY][1];
-
           //remove the bomb
           gameMatrix[newX][newY][1] = 0;
-
-          //Give that zumo a new bomb
+          //Give that plkayer's zumo a new bomb
           zumoDetails[id - 1][1] = 1;
           // increase its score by 5 points
           zumoDetails[id - 1][2] = zumoDetails[id - 1][2] + 5;
-
           //if they have deployed their bomb, find it and remove it
           if (zumoDetails[playerID - 1][1] == 0)
           {
@@ -272,19 +248,15 @@ void moveZumo(int playerID, char dir)
               }
             }
           }
-
           //remove their zumo from the grid
           gameMatrix[x][y][0] = 0;
           delay(2000);
           xBee.println('M');
           toSend = String(playerID) + ":b";
           xBee.println(toSend);
-
           players[playerID - 1]->die();
-
           //the current player's zumo is dead. Post their score.
           postScore(playerID, zumoDetails[playerID - 1][2]);
-
           return;
         }
         //if you haven't hit a bomb
@@ -292,10 +264,8 @@ void moveZumo(int playerID, char dir)
         gameMatrix[newX][newY][0] = gameMatrix[x][y][0];
         //clear the previous square
         gameMatrix[x][y][0] = 0;
-
         //give a point for surviving a turn
         zumoDetails[playerID - 1][2] = zumoDetails[playerID - 1][2] + 1;
-
         return;
       }
     }
@@ -339,7 +309,13 @@ void onSuccess(HttpResponse& res)
   Terminal.println(res.getTotalBytesCount());
 }
 
-//returns true if the co-ordinates contain a bomb, and false if they do not
+/**
+   check a tile to see if a bomb is present
+
+   @param  x  Integer representing the x co-ordinate
+   @param  y  Integer representing the y co-ordinate
+   @return boolean specifying whether a bomb was found
+*/
 bool containsBomb(int x, int y) {
   if (gameMatrix[x][y][1] != 0)
   {
@@ -348,8 +324,13 @@ bool containsBomb(int x, int y) {
   return false;
 }
 
+/**
+   add a new player's zumo to the game
+
+   @param playerID  Integer representing the zumo to be handled
+*/
 void setZumo(int playerID) {
-  //set te zumo up in the right column
+  //set the zumo up in the right column
   gameMatrix[playerID - 1][0][0] = playerID;
   //set the orientation
   zumoDetails[playerID - 1][0] = 1;
@@ -359,7 +340,11 @@ void setZumo(int playerID) {
   zumoDetails[playerID - 1][2] = 0;
 }
 
-//call this when a player signals they want to drop their bomb. Players should drop their bomb before they move
+/**
+   place a bomb in the same game tile as the current player's zumo
+
+   @param playerID  Integer representing the zumo to be handled
+*/
 void setBomb(int playerID) {
   //if the player has a bomb
   if (zumoDetails[playerID - 1][1] == 1) {
@@ -377,7 +362,12 @@ void setBomb(int playerID) {
   }
 }
 
-//posts a score. is called when a zumo dies, needs to be called for the last man standing, we need to figure out how to tell when the last man is standing.
+/**
+   if only one player remains, post their score and end the game
+
+   @param playerID  Integer representing the zumo to be handled
+   @param playerScore  Integer representing the player's score
+*/
 void postScore(int playerID, int playerScore)
 {
 
@@ -387,14 +377,14 @@ void postScore(int playerID, int playerScore)
   int lastZumo = 0;
   int lastMansX = 0;
   int lastMansY = 0;
-  //look for zumo's
+  //look for zumos
   for (int x = 0; x < 4; x++)
   {
     for (int y = 0; y < 4; y++)
     {
       if (gameMatrix[x][y][0] != 0)
       {
-        //count the ones you find and remember the last on you've found
+        //count the ones you find and remember the last one you've found
         //and where it is
         count++;
         lastZumo = gameMatrix[x][y][0];
@@ -423,38 +413,31 @@ void postScore(int playerID, int playerScore)
       }
     }
     delay(5000);
-
     // Game over
     TextToSpeech.say("Game over. Player" + String(lastZumo) + " wins!");
-
     delay(3000);
     xBee.println('M');
     String sendVictory = String(lastZumo) + ":v";
     xBee.println(sendVictory);
-
-    
     delay(2000);
     //remove it from the game matrix
     gameMatrix[lastMansX][lastMansY][0] = 0;
     //post its score
     players[lastZumo - 1]->setScore(zumoDetails[lastZumo - 1][2]);
     submitScore(lastZumo);
-    //do a victory dance or something?
-    //victory(playerID);
-
     delay(2000);
-
-
     // Enter endless while loop to terminate program
-    while (true) {
-
-    }
+    while (true) {}
   }
 }
 
-//tells the zumo if you have turned, call this each time a 90 degree turn is made
-void setOrientation(int playerID, char turnVal) {
+/**
+   keep track of the player's zumo making 90 degree turns
 
+   @param playerID  Integer representing the zumo to be handled
+   @param turnVal  Char representing the turn direction
+*/
+void setOrientation(int playerID, char turnVal) {
   //for turning right
   // advance round the compass clockwise 1 position
   if (turnVal == 'r') {
@@ -477,6 +460,12 @@ void setOrientation(int playerID, char turnVal) {
   }
 }
 
+/**
+   check if a proposed move is possible without violating game rules
+
+   @param playerID  Integer representing the zumo to be handled
+   @return Boolean representing whether a proposed move is possible
+*/
 bool canMove(int playerID) {
   for (int x = 0; x < 4; x++)
   {
@@ -494,9 +483,9 @@ bool canMove(int playerID) {
           return false;
         }
         if ((zumoDetails[playerID - 1][0] == 1 && gameMatrix[x][y + 1][0] != 0) ||
-          (zumoDetails[playerID - 1][0] == 2 && gameMatrix[x + 1][y][0] != 0) ||
-          (zumoDetails[playerID - 1][0] == 3 && gameMatrix[x][y - 1][0] != 0) ||
-          (zumoDetails[playerID - 1][0] == 4 && gameMatrix[x - 1][y][0] != 0))
+            (zumoDetails[playerID - 1][0] == 2 && gameMatrix[x + 1][y][0] != 0) ||
+            (zumoDetails[playerID - 1][0] == 3 && gameMatrix[x][y - 1][0] != 0) ||
+            (zumoDetails[playerID - 1][0] == 4 && gameMatrix[x - 1][y][0] != 0))
         {
           TextToSpeech.say("Invalid move. There is a player in the way.");
           delay(1000);
