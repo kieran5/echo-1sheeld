@@ -70,9 +70,9 @@ void setup()
           // Send this number across to the Zumo to assign as it's unique ID
           ++connectionCount;
           xBee.println(connectionCount);
-          
+
           assignNicknameToPlayer();
-          
+
           break;
       }
     }
@@ -81,14 +81,14 @@ void setup()
   String numPlayers = String(connectionCount);
   TextToSpeech.say(numPlayers + "players connected. Player 1, it's your turn.");
   delay(4000);
-  
+
   // Activate voice recognition ready for first players command
   VoiceRecognition.start();
 }
 
 void loop()
 {
-  // Reads in voice command from user and sends 
+  // Reads in voice command from user and sends
   // communication to Zumo to tell it which way to move
   if (VoiceRecognition.isNewCommandReceived()) {
     if (strstr(VoiceRecognition.getLastCommand(), forwardCommand)) {
@@ -151,9 +151,9 @@ void loop()
 }
 
 /**
-* @ author Kieran
-* @ description Every time a Zumo is connected, this method will be called to prompt the user to 
-* say their name to be assigned to their corrosponding Zumo
+  @ author Kieran
+  @ description Every time a Zumo is connected, this method will be called to prompt the user to
+  say their name to be assigned to their corrosponding Zumo
 */
 void assignNicknameToPlayer() {
   bool nickAssigned = false;
@@ -167,7 +167,7 @@ void assignNicknameToPlayer() {
 
     if (VoiceRecognition.isNewCommandReceived()) {
       String nickname = VoiceRecognition.getLastCommand();
-      
+
       // Once a nickname has been recognised and assigned
       // We can create a new Player object and initialise with the players ID & nickname
       Player* player = new Player(connectionCount, nickname);
@@ -187,13 +187,13 @@ void assignNicknameToPlayer() {
     }
   }
   // Reset 10 second timer
-  lastConnectedTime = millis();  
+  lastConnectedTime = millis();
 }
 
 /**
-* @ author Kieran
-* @ description This method will be called every time a valid move is made by a player.
-* This method will ensure the next player is chronologically selected and is still alive before breaking out & letting the game continue
+  @ author Kieran
+  @ description This method will be called every time a valid move is made by a player.
+  This method will ensure the next player is chronologically selected and is still alive before breaking out & letting the game continue
 */
 void nextPlayersTurn() {
   // If last players turn, then needs to go back to players 1's turn
@@ -204,7 +204,7 @@ void nextPlayersTurn() {
   }
 
   // Check current player is alive before saying it is their turn
-  // If not we use recursion & call this method again until we find 
+  // If not we use recursion & call this method again until we find
   // a player that is alive to break out of the method
   if (players[currentPlayer - 1]->isAlive()) {
     TextToSpeech.say("Player " + String(currentPlayer) + "'s turn");
@@ -217,10 +217,11 @@ void nextPlayersTurn() {
 }
 
 /**
-   Update the position of the zumo in the matrix and check if it survives
+   @ author  Frank
+   @ description  Update the position of the zumo in the matrix and check if it survives
 
    @param playerID  Integer representing the zumo to be handled
-   @param dir  Char representing the direction of the zumo (unused?)
+   @param dir  Char representing the direction of the zumo
 */
 void moveZumo(int playerID, char dir)
 {
@@ -308,11 +309,11 @@ void moveZumo(int playerID, char dir)
 
 
 /**
-* @author      Jake Slade
-* @description This method retribves a nickname and score for the associated player ID from an instantiation of Player class, 
-*              adds it to an HTTP request and submits it to our REST api and adds it to the game highscores
-* @params      The player ID of the users details you would like to submit to the hiscores 
-* @returns     void
+  @author      Jake Slade
+  @description This method retrieves a nickname and score for the associated player ID from an instantiation of Player class,
+               adds it to an HTTP request and submits it to our REST api and adds it to the game highscores
+  @params      The player ID of the users details you would like to submit to the hiscores
+  @returns     void
 */
 void submitScore(int playerID)
 {
@@ -336,10 +337,10 @@ void submitScore(int playerID)
 }
 
 /**
-* @author      Jake Slade
-* @description This method is invoked when our HTTP request fails. It shows us the status code of the failure and the amount of data.
-* @params      A reference of the HTTP protocol response
-* @returns     void
+  @author      Jake Slade
+  @description This method is invoked when our HTTP request fails. It shows us the status code of the failure and the amount of data.
+  @params      A reference of the HTTP protocol response
+  @returns     void
 */
 void onFailure(HttpResponse& res)
 {
@@ -350,10 +351,10 @@ void onFailure(HttpResponse& res)
 }
 
 /**
-* @author      Jake Slade
-* @description This method is invoked when our HTTP request succeeds. It shows us the status code of the failure and the amount of data.
-* @params      A reference of the HTTP protocol response
-* @returns     void
+  @author      Jake Slade
+  @description This method is invoked when our HTTP request succeeds. It shows us the status code of the failure and the amount of data.
+  @params      A reference of the HTTP protocol response
+  @returns     void
 */
 void onSuccess(HttpResponse& res)
 {
@@ -364,7 +365,8 @@ void onSuccess(HttpResponse& res)
 }
 
 /**
-   check a tile to see if a bomb is present
+   @ author  Frank
+   @ description  check a tile to see if a bomb is present
 
    @param  x  Integer representing the x co-ordinate
    @param  y  Integer representing the y co-ordinate
@@ -379,7 +381,8 @@ bool containsBomb(int x, int y) {
 }
 
 /**
-   add a new player's zumo to the game
+   @ author  Frank
+   @ description  add a new player's zumo to the game
 
    @param playerID  Integer representing the zumo to be handled
 */
@@ -395,7 +398,8 @@ void setZumo(int playerID) {
 }
 
 /**
-   place a bomb in the same game tile as the current player's zumo
+   @ author  Frank
+   @ description  place a bomb in the same game tile as the current player's zumo
 
    @param playerID  Integer representing the zumo to be handled
 */
@@ -417,7 +421,8 @@ void setBomb(int playerID) {
 }
 
 /**
-   if only one player remains, post their score and end the game
+   @ author  Frank
+   @ description  if only one player remains, command them to play a victory tune and pass their details to the submitScore function
 
    @param playerID  Integer representing the zumo to be handled
    @param playerScore  Integer representing the player's score
@@ -486,7 +491,8 @@ void postScore(int playerID, int playerScore)
 }
 
 /**
-   keep track of the player's zumo making 90 degree turns
+   @ author  Frank
+   @ description  keep track of the player's zumo making 90 degree turns
 
    @param playerID  Integer representing the zumo to be handled
    @param turnVal  Char representing the turn direction
@@ -515,7 +521,8 @@ void setOrientation(int playerID, char turnVal) {
 }
 
 /**
-   check if a proposed move is possible without violating game rules
+   @ author  Frank
+   @ description  check if a proposed move is possible without violating game rules
 
    @param playerID  Integer representing the zumo to be handled
    @return Boolean representing whether a proposed move is possible
