@@ -114,6 +114,13 @@ void loop()
     }
 }
 
+/**
+* @author      Jake Slade
+* @description This method is used to accurately turn the Zumo using it's gyroscope
+* @params      The angle that you'd like to turn, -90 would turn 90 degrees clockwise, 90 would turn 90 degrees anti-clockwise.
+* @returns     void
+*/
+
 void turn(int target)
 {
     turnSensorReset();
@@ -137,6 +144,13 @@ void turn(int target)
     motors.setSpeeds(0, 0);
 }
 
+/**
+* @author      Jake Slade
+* @description This method is called to send the Zumo in to a new grid cell. It will cross one black line, 
+               and stop at the next that it hits, and then automatically readjust itself so that is is flush wiuth the line. 
+* @params      A reference of the HTTP protocol response
+* @returns     void
+*/
 void advance()
 {
     bool hasCrossedLine = false;
@@ -170,11 +184,24 @@ void advance()
     motors.setSpeeds(0, 0);
 }
 
+
+/**
+* @author      Jake Slade
+* @description A bool check to see if our QTR sensors are above the desired threshhold (in our case, over a line).
+* @params      The pins that you want to check, in our case this would be an element of sensor_values, eg. sensor_values[5]
+* @returns     True if the sensor is above the threshold, otherwise false
+*/
 bool isOverLine(int sensorPin)
 {
     return sensorPin > QTR_THRESHOLD;
 }
 
+/**
+* @author      Jake Slade
+* @description This method is for auto re-alignment of the Zumo at the end of each turn.
+* @params      void
+* @returns     void
+*/
 void moveForwardWithinBoundaries()
 {
     if (isOverLine(sensor_values[0])) //if leftmost sensor detects the border
@@ -193,6 +220,12 @@ void moveForwardWithinBoundaries()
     }
 }
 
+/**
+* @author      Jake Slade
+* @description Makes the Zumo perform a 'death animation' and play a sad tune.
+* @params      void
+* @returns     void
+*/
 void doDeathSpin()
 {
     buzzer.playFromProgramSpace(deathTune);
