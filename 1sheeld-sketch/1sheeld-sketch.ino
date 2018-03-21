@@ -24,14 +24,11 @@ int connectionCount = 0;
 HttpRequest scoreRequest("https://kwillis.eu/hiscores");
 
 // Voice recognition
-bool voiceCommandActive = false;
 // Commands to be recognised by Zumos
-
 const char forwardCommand[] = "forward";
 const char backwardCommand[] = "backward";
 const char leftCommand[] = "left";
 const char rightCommand[] = "right";
-const char bombCommand[] = "bomb";
 
 // Variable so the 1Sheeld knows who's turn it is next
 int currentPlayer = 1;
@@ -45,6 +42,7 @@ int zumoDetails[4][3]; //a 2 dimensional array to hold zumo details
 //[1] Does it have a bomb, 0 for no, 1 for yes
 //[2] Score
 
+// Last connected time variable to be used in the timer for connecting new players
 unsigned long lastConnectedTime = millis();
 
 
@@ -57,56 +55,43 @@ void setup()
   xBee.begin(9600);
   xBee.println("Sheeld First Broadcast");
 
+  // Ten second timer to connect a new player
+  // After no players are connected for 10 seconds, the game will automatically begin
   while (millis() - lastConnectedTime < 10000) {
     if (xBee.available() > 0) {
 
       value = (char)xBee.read();
 
+      // When the Zumo is turned on & its button is pressed
+      // It sends an 'I' to the 1Sheeld
       switch (value) {
         case 'I':
+          // We increment the connection count variable
+          // Send this number across to the Zumo to assign as it's unique ID
           ++connectionCount;
           xBee.println(connectionCount);
-
-          bool nickAssigned = false;
-
-          TextToSpeech.say("Say your name now.");
-          delay(2000); //so text to speech can talk without affecting voice recognition
-          VoiceRecognition.start();
-          delay(5000); //so player has time to say their name after start()
-
-          while (!nickAssigned) {
-
-            if (VoiceRecognition.isNewCommandReceived()) {
-              String nickname = VoiceRecognition.getLastCommand();
-              Player* player = new Player(connectionCount, nickname);
-              players.push_back(player);
-              nickAssigned = true;
-              setZumo(connectionCount);
-              TextToSpeech.say("Player " + String(connectionCount) + " successfully registered.");
-
-            } else {
-              Terminal.println("false");
-            }
-          }
-          lastConnectedTime = millis();
+          
+          assignNicknameToPlayer();
+          
           break;
       }
     }
   }
-  String s = String(connectionCount);
-  TextToSpeech.say(s + "players connected. Player 1, it's your turn.");
+  // Confirm to players how many of them have connected
+  String numPlayers = String(connectionCount);
+  TextToSpeech.say(numPlayers + "players connected. Player 1, it's your turn.");
   delay(4000);
+  
+  // Activate voice recognition ready for first players command
   VoiceRecognition.start();
 }
 
-
 void loop()
 {
+  // Reads in voice command from user and sends 
+  // communication to Zumo to tell it which way to move
   if (VoiceRecognition.isNewCommandReceived()) {
-    if (strstr(VoiceRecognition.getLastCommand(), bombCommand)) {
-      setBomb(currentPlayer);
-    }
-    else if (strstr(VoiceRecognition.getLastCommand(), forwardCommand)) {
+    if (strstr(VoiceRecognition.getLastCommand(), forwardCommand)) {
       if (canMove(currentPlayer)) {
         moveZumo(currentPlayer, 'w');
         delay(3000);
@@ -114,6 +99,10 @@ void loop()
       }
     }
     else if (strstr(VoiceRecognition.getLastCommand(), leftCommand)) {
+      // Zumo always knows what direction it is facing
+      // We have to change orientation to check if the Zumo can move that way
+      // If so, we tell the Zumo to move. If not, we change the orientation back to its original state
+      // Then ask player to give a valid command
       setOrientation(currentPlayer, 'l');
 
       if (canMove(currentPlayer)) {
@@ -153,28 +142,73 @@ void loop()
     }
     return;
   }
+
+  // Awaiting for user to press the push button on 1Sheeld app to drop
+  // a bomb on the square they are currently on
   if (PushButton.isPressed()) {
     setBomb(currentPlayer);
   }
 }
 
+/**
+* @ author Kieran
+* @ description Every time a Zumo is connected, this method will be called to prompt the user to 
+* say their name to be assigned to their corrosponding Zumo
+*/
+void assignNicknameToPlayer() {
+  bool nickAssigned = false;
 
+  TextToSpeech.say("Say your name now.");
+  delay(2000); //so text to speech can talk without affecting voice recognition
+  VoiceRecognition.start();
+  delay(5000); //so player has time to say their name after start()
+
+  while (!nickAssigned) {
+
+    if (VoiceRecognition.isNewCommandReceived()) {
+      String nickname = VoiceRecognition.getLastCommand();
+      
+      // Once a nickname has been recognised and assigned
+      // We can create a new Player object and initialise with the players ID & nickname
+      Player* player = new Player(connectionCount, nickname);
+
+      // Push new player object to our vector so we can access throughout
+      players.push_back(player);
+
+      // Change bool to true to break out of while loop
+      nickAssigned = true;
+
+      // Set Zumo on our grid and notify user that they have successfully registered
+      setZumo(connectionCount);
+      TextToSpeech.say("Player " + String(connectionCount) + " successfully registered.");
+
+    } else {
+      Terminal.println("false");
+    }
+  }
+  // Reset 10 second timer
+  lastConnectedTime = millis();  
+}
+
+/**
+* @ author Kieran
+* @ description This method will be called every time a valid move is made by a player.
+* This method will ensure the next player is chronologically selected and is still alive before breaking out & letting the game continue
+*/
 void nextPlayersTurn() {
+  // If last players turn, then needs to go back to players 1's turn
   if (connectionCount == currentPlayer) {
     currentPlayer = 1;
   } else {
     currentPlayer++;
   }
-  if (players[currentPlayer - 1]->isAlive()) {
-    if (currentPlayer == 1) {
-      TextToSpeech.say("Player 1's turn");
-      delay(1000);
-    }
-    else {
-      TextToSpeech.say("Player " + String(currentPlayer) + "'s turn");
-      delay(1000);
-    }
 
+  // Check current player is alive before saying it is their turn
+  // If not we use recursion & call this method again until we find 
+  // a player that is alive to break out of the method
+  if (players[currentPlayer - 1]->isAlive()) {
+    TextToSpeech.say("Player " + String(currentPlayer) + "'s turn");
+    delay(1000);
     VoiceRecognition.start();
   }
   else {
