@@ -306,6 +306,14 @@ void moveZumo(int playerID, char dir)
   }
 }
 
+
+/**
+* @author      Jake Slade
+* @description This method retribves a nickname and score for the associated player ID from an instantiation of Player class, 
+*              adds it to an HTTP request and submits it to our REST api and adds it to the game highscores
+* @params      The player ID of the users details you would like to submit to the hiscores 
+* @returns     void
+*/
 void submitScore(int playerID)
 {
   scoreRequest.setOnSuccess(&onSuccess);
@@ -327,6 +335,12 @@ void submitScore(int playerID)
   Internet.performPost(scoreRequest);
 }
 
+/**
+* @author      Jake Slade
+* @description This method is invoked when our HTTP request fails. It shows us the status code of the failure and the amount of data.
+* @params      A reference of the HTTP protocol response
+* @returns     void
+*/
 void onFailure(HttpResponse& res)
 {
   //Do below on an unsuccessful HTTP request
@@ -335,6 +349,12 @@ void onFailure(HttpResponse& res)
   Terminal.println(res.getTotalBytesCount());
 }
 
+/**
+* @author      Jake Slade
+* @description This method is invoked when our HTTP request succeeds. It shows us the status code of the failure and the amount of data.
+* @params      A reference of the HTTP protocol response
+* @returns     void
+*/
 void onSuccess(HttpResponse& res)
 {
   //Do below on a successful HTTP request
